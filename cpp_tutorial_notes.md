@@ -137,3 +137,445 @@ Example:
     * the matching asterisks to the left
     * can make this easier to read
     */
+
+
+## Objects
+Like most programming langauges, direct memory access is discouraged and instead accessed indirectly via *object*. An object can be named or unnamed (anonymous). A named object is called a *variable* while the name of the object is called an *identifier*.
+
+```
+int x; // define a variable named x, of type int
+```
+
+Objects must be declared and a declaration statement is called a *definition*. 
+
+At compile time, objects are not yet created but the compiler takes note that we are defining a certain variable with a certain name with its data type. Like Java the Object's data type must be known at compile time (static). 
+At runtime, the object is created and assigned a memory address. This is called *instantiation* and an instantiated object is also called an *instance*.
+
+## Declaration vs Definition
+A *declaration* provides basic attributes of a symbol: its type and its name. A *definition* provides all of the details of that symbol -- if it's a function, what it does; if it's a class, what fields and methods it has; if it's a variable, where the variable gets stored. Thus memory for the variable is allocated during the definition of the variable.
+
+In C language definition and declaration for a variable takes place at the same time. i.e. there is no difference between declaration and definition. 
+
+## Defining multiple variables
+It is possible to define multiple variables of the same type in a single statement by separating the names with a comma. The following code declares two variables of same integer type:
+
+```
+    int a, b;
+```
+
+You can't define variables of different types in the same statement. Variables of different types must be defined in separate statements.
+
+```
+    int a, double b; // wrong (compiler error)
+    int a; double b; // correct (but not recommended)
+
+    // correct and recommended (easier to read)
+    int a;
+    double b;
+```
+
+## Variable assignment and ininitialization
+After defining a variable you can give it a value.
+
+```
+    #include <iostream>
+
+    int main()
+    {
+        int width;
+        width = 5; // copy assignment of value 5 into variable width
+
+        // variable width now has value 5
+
+        width = 7; // change value stored in variable width to 7
+
+        // variable width now has value 7
+
+        return 0;
+    }
+```
+
+When no value is assigned to a value, it is called *default initializiation*. The variable references an undeterminate value. There are 4 basic ways to initialize variables in C++:
+- default initializiation - nothing is assigned
+- Copy initialization - assigned with =
+- Direct initialization - assigned with ()
+- Brace initialization - assigned with {}. modern way of initializing objects in C++
+
+Declaration and initialization can be done on same one line:
+
+```
+    int a; // no initializer
+    int b = 5; // initializer after equals sign
+    int c( 6 ); // initializer in parenthesis
+    int d { 7 }; // initializer in braces
+```
+
+Brace initialization doesn't allow *narrowing conversions*. This means that if you try to brace initialize a variable using a value that the variable can not safely hold, the compiler will produce an error. 
+
+```
+int width { 4.5 }; // error: a number with a fractional value can't fit into an int
+```
+
+If we tried copy and direct initialization, the compiler would simply drop the fractional part, resulting in the initialization of value 4 into variable width.'
+
+## Value initialization and Zero initalization
+When a variable is initialized with empty braces, *value initialization* takes place. In most cases, value initialization will initialize the variable to zero (or empty, if that’s more appropriate for a given type). 
+This is useful when we want to create empty variables that is ready to accept an input.
+
+*if a class is built-int, it will perform the same *value initialization*. But if the class is user-declared, it will invoke the dfault constructore.
+
+## Multiple initialization
+Like declarations, initialization of same types can be done on the same line. Keep in mind that all the variables on the line must be initialized, not just some:
+
+```
+    int a, b = 5; // wrong (a is not initialized!)
+    int a = 5, b = 6; // copy initialization
+    int c( 7 ), d( 8 ); // direct initialization
+    int e { 9 }, f { 10 }; // brace initialization (preferred)
+```
+
+## IOStream library: output
+As part of the C++ standard library that deals with IO. 
+
+To print something, use *std::cout*, along with the *insertion operator* *<<,*
+
+```
+    #include <iostream> // for std::cout
+
+    int main()
+    {
+        int x{ 5 };                         // define integer variable x, initialized with value 5
+        std::cout << x;                     // print value of x (5) to console
+        std::cout << "Hello" << " world!";  // print multiple things in one line
+        return 0;
+    }
+```
+
+Keep in mind that separate output statements don’t result in separate lines of output on the console. If we want to print separate lines of output to the console, we need to tell the console when to move the cursor to the next line using either  *std::endl* or the esacpe character '\n':
+
+```
+    #include <iostream> // for std::cout
+
+    int main()
+    {
+        int x{ 5 };
+        std::cout << "x is equal to: " << x << '\n';   // \n standalone, single quote needed
+        std::cout << "And that's all, folks!\n";   // '\n' embedded, double quote needed
+        return 0;
+    }
+```
+
+For the standalone '\n', single quotes are needed. For the embedded '\n' above, double quotes are needed.
+
+```
+    #include <iostream> // for std::cout
+
+    int main()
+    {
+        std::cout << "Hi!" << std::endl;
+        std::cout << "My name is Alex." << std::endl;
+        return 0;
+    }
+```
+
+The second std::endl above isn’t technically necessary, since the program ends immediately afterward. However, it serves a few useful purposes:
+
+- indicate that the line of output is a “complete thought” (as opposed to partial output that is completed somewhere later in the code). In this sense, it functions similarly to using a period in standard English.
+- positions the cursor on the next line, so that if we later add additional lines of output (e.g. have the program say “bye!”), those lines will appear where we expect (rather then appended to the prior line of output).
+- after running an executable from the command line, some operating systems do not output a new line before showing the command prompt again. If our program does not end with the cursor on a new line, the command prompt may appear appended to the prior line of output, rather than at the start of a new line as the user would expect.
+
+*std::endl* does two jobs: it moves the cursor to the next line, and flushes the output. When writing text to the console using std::cout, std::cout often flushes output anyway. Thus we prefer *\n* and it is easier to read.
+
+## IOStream library: input
+*std::cin* (which stands for “character input”) reads input from keyboard using the *extraction operator* (>>). The input must be stored in a variable to be used thus this is where zero initialization comes in. Just like it is possible to output more than one bit of text in a single line, it is also possible to input more than one value on a single line:
+
+```
+    #include <iostream>  // for std::cout and std::cin
+
+    int main()
+    {
+        std::cout << "Enter two number separated by a space: ";
+
+        int x{ }; // define variable x to hold user input (and zero-initialize it)
+        int y{ }; // define variable y to hold user input (and zero-initialize it)
+        std::cin >> x >> y; 
+
+        std::cout << "You entered " << x << " and " << y << '\n';
+        return 0;
+    }
+```
+
+Note that you don’t need to use ‘\n’ when accepting input, as the user will need to press the enter key to have their input accepted, and this will move the cursor to the next line.
+
+*In line with our previous recommendation that *variables should always be initialized*, best practice is to initialize the variable first.
+
+*The C++ I/O library does not provide a way to accept keyboard input without the user having to press enter. If this is something you desire, you’ll have to use a third party library.
+
+## Initialized vs Uninitialized
+C++ does not initialize most variables to a given value (zero) automatically. When a variable is given a memory address to store data, the default value is whatever garbage value that already happens to be in that memory address. A variable that hasn't been given a known value is called an uninitialied variable. 
+
+Initialized is not the opposite of uninitialized. Initialized means the object was provided with an initial value at the time of definition and uninitilaized means the object has not been given a known value. If an uninitialized object is assigned a known value, it is no longer uninitialized. 
+
+- Initialization = The object is given a known value at the point of definition.
+- Assignment = The object is given a known value beyond the point of definition.
+- Uninitialized = The object has not been given a known value yet.
+
+This lack of initialization is a performance optimization inherited from C, back when computers were slow. Imagine a case where you were going to read in 100,000 values from a file. In such case, you might create 100,000 variables, then fill them with data from the file.
+
+If C++ initialized all of those variables with default values upon creation, this would result in 100,000 initializations (slow) and for little benefit (since you’re overwriting those values anyway).
+
+For now, you should always initialize your variables because the cost of doing so is miniscule compared to the benefit. Once you are more comfortable with the language, there may be certain cases where you omit the initialization for optimization purposes. But this should always be done selectively and intentionally.
+
+```
+#include <iostream>
+
+int main()
+{
+    // define an integer variable named x
+    int x; // this variable is uninitialized because we haven't given it a value
+
+    // print the value of x to the screen
+    std::cout << x; // who knows what we'll get, because x is uninitialized
+
+    return 0;
+}
+```
+
+Most modern compilers will attempt to detect if a variable is being used without being given a value. The program may run fine anyway if the uninitialized variable happened to get assigned to a spot of memory that had a reasonable value in it, like 0. Otherwise, the compilers will be able to detect uninitialized variables, they will generally issue a compile-time error. For example, compiling the above program on Visual Studio produced the 'uninitialized local variable 'x' used' warning.
+
+A nice trick to get around this is to make the compiler think we are assigning a value to the variable.
+
+```
+#include <iostream>
+
+    void doNothing(int&) // does nothing
+    {
+    }
+
+    int main()
+    {
+        // define an integer variable named x
+        int x; // this variable is uninitialized
+
+        doNothing(x); // make the compiler think we're assigning a value to this variable
+
+        // print the value of x to the screen (who knows what we'll get, because x is uninitialized)
+        std::cout << x;
+
+        return 0;
+    }
+```
+
+always initialize your variables!
+
+## Undefined behavior
+Using the value from an uninitialized variable is our first example of *undefined behavior*. Undefined behavior (often abbreviated UB) is the result of executing code whose behavior is not well defined by the C++ language. In this case, the C++ language doesn’t have any rules determining what happens if you use the value of a variable that has not been given a known value. Consequently, if you actually do this, undefined behavior will result.
+
+Code implementing undefined behavior may exhibit any of the following symptoms:
+- different results every time it is run.
+- same incorrect result.
+- inconsistent behavior (sometimes produces the correct result, sometimes not).
+- seems like its working but produces incorrect results later in the program.
+- program crashes, either immediately or later.
+- program works on some compilers but not others.
+- program works until you change some other seemingly unrelated code.
+
+As a general rule of thumb, take care to avoid all situations that result in undefined behavior, such as using uninitialized variables.
+
+## Keywords and Special identifiers
+C++ has keywords and special identifiers: override, final, import, and module. While key words are reserved, special identifiers are not reserved. 
+
+There are three different naming conventions:
+
+- CamelCase
+- snake_case
+- pascalCase
+
+C++ uses CamelCase like Java. 
+
+Some things to keep in mind when naming:
+
+- avoid naming your identifiers starting with an underscore, as these names are typically reserved for OS, library, and/or compiler use.
+- avoid abbreviations
+- avoid trivial an overly complex names
+
+## Whitespace and Basic formatting
+The C++ compiler generally ignores whitespaces thus we say that C++ is a whitespace-independent language. The following all do the exact same thing:
+
+```
+    std::cout << "Hello world!";
+
+    std::cout               <<            "Hello world!";
+
+            std::cout << 		"Hello world!";
+
+    std::cout
+        << "Hello world!";
+```
+
+For that reason, whitespaces and newlines are often used for code organization and readability.
+
+The only exception is when whitespaces exist inside quoted text and comments. Newlines are not allowed in quoted text and comments:
+
+```
+    std::cout << "Hello
+        world!"; // Not allowed!
+
+    std::cout << "Hello "
+        "world!"; // prints "Hello world!"
+
+    std::cout << "Hello world!"; // Here is a single-line comment
+    this is not part of the comment     
+```
+
+Because newlines and whitespaces only matter in quoted texts and comments, developers often do the following when declaring a function body: 
+
+```
+int main()
+{
+    std::cout << "Hello world!\n"; // tabbed in one tab (4 spaces)
+    std::cout << "Nice to meet you.\n"; // tabbed in one tab (4 spaces)
+}
+```
+
+Some more coding style conventions: 
+
+- keep a single line no longer than 80 chars
+- if the comment is above a code, there should be a new line above the comment
+- if the comment is on the right hand side of the code, use whitespaces to align them
+- use whitespace to make your code easier to read by aligning values
+
+```
+    cost          = 57;
+    pricePerItem  = 24;
+    value         = 5;
+    numberOfItems = 17;
+    std::cout << "Hello world!\n";                  // cout lives in the iostream library
+    std::cout << "It is very nice to meet you!\n";  // these comments are easier to read
+    std::cout << "Yeah!\n";                         // especially when all lined up
+
+    // cout lives in the iostream library
+    std::cout << "Hello world!\n";
+
+    // these comments are easier to read
+    std::cout << "It is very nice to meet you!\n";
+
+    // when separated by whitespace
+    std::cout << "Yeah!\n";
+```
+
+Using the automatic formatting feature is highly recommended to keep your code’s formatting style consistent. However, don't trust it completely as it sometimes may not choose the most readable formatting. Go over the code with your eyes for double checking. 
+
+## Literals and Operators
+A *literal* or a *constant* is a fixed value that has been directly inserted into the source code. Literals can't be changed while variable value's can be changed through initialization and assignment.
+
+```
+std::cout << "Hello world!";  // Hello world! is a literal
+int x{ 5 };                   // 5 is a literal
+```
+
+Operators in C++ come in four different arities:
+
+- Unary operators - act on one operand. An example is the negative operator
+- Binary operators - act on two operands. The insertion (<<) and extraction (>>) operators are binary operators, taking std::cout or std::cin on the left side, and the value to output or variable to input to on the right side.
+- Ternary operators - act on three operands. There is only one of these in C++ (the conditional operator), which we’ll cover later.
+- Nullary operators - act on zero operands. There is also only one of these in C++ (the throw operator), which we’ll also cover later.
+
+## Expression
+An expression is a combination of literals, variables, operators, and function calls that *calculates a single value*. The process of executing an expression is called *evaluation*, and the single value produced is called the result of the expression.
+
+Literals evaluate to their own values. 
+Variables evaluate to the value of the variable.
+Function calls evaluate to whatever value the function returns. 
+Operators (such as operator+) let us combine multiple values together to produce a new value.
+
+Expressions do not end in a semicolon, and cannot be compiled by themselves. Rather, expressions are always evaluated as part of statements. An *expression statement* is a statement that consists of an expression followed by a semicolon. When the statement is executed, the expression will be evaluated.
+
+```
+    // type identifier { expression };
+    int x{ 2 + 3 };
+```
+
+An *expression statement* is a statement that consists of an expression followed by a semicolon. When the statement is executed, the expression will be evaluated.
+
+An expression whose result is discarded is called a *discarded-value expression*. Expression statements are by far the most common type of discarded-value expressions.
+
+# 2. Functions and Files
+
+## Functions
+A function is a reusable sequence of statements designed to do a particular job. Functions written yourself are called *user-defined functions*. When a function is called inside another FUNCTION, the CPU puts a bookmark at the current point of execution and executes the *called* function. When the called function ends, the CPU returns back to the point of book mark of the *caller* function and resumes execution.
+
+The signature of the function is also called the *function header*.The curly braces and statements in-between are called the *function body*
+
+Unlike some other languages like Python, C++ doesn't allow nested functions like the following:
+
+```
+    #include <iostream>
+
+    int main()
+    {
+        void foo() // Illegal: this function is nested inside function main()
+        {
+            std::cout << "foo!\n";
+        }
+
+        foo(); // function call to foo()
+        return 0;
+    }
+```
+
+C++ disallows calling the main function explicitly and the main function should be at the bottom of your code module.
+
+Functions should be minimal and only perform one type of action. If you see a block of code that is repeated, it is best to put that in a separate function and make calls to that function. This is follwoing the DRY best practice: *don’t repeat yourself*
+
+```
+    #include <iostream>
+    int getValueFromUser() 
+    {
+        int input{};
+        std::cout << "Enter an integer: ";
+        std::cin >> input; 
+        return input;
+    }
+
+    int main()
+    {
+        int x{ getValueFromUser() };
+        int y{ getValueFromUser() };
+        std::cout << x << " + " << y << " = " << x + y << '\n';
+        return 0;
+    }
+```
+
+## Return
+C++ has a garbage collector for memory management. When a function terminates, all the value entered inside that function is lost. To save any data from that function, we have the *return* keyword to return a value or data. You can use that value in an expression or statement (by assigning to a variable or sending it somewhere). Otherwise it will be ignored. 
+
+Of course we must save that returned value by assigning a variable to it. Otherwise it will get lost.
+
+```
+#include <iostream>
+
+int getValueFromUser() // this function now returns an integer value
+{
+ 	std::cout << "Enter an integer: ";
+	int input{};
+	std::cin >> input;
+
+	return input; // return the value the user entered back to the caller
+}
+
+int main()
+{
+	int num { getValueFromUser() }; // initialize num with the return value of getValueFromUser()
+
+	std::cout << num << " doubled is: " << num * 2 << '\n';
+
+	return 0;
+}
+```
+
+In the main function, a status code of 0 means the program executed successfully. 
+
+In C++, a function can only return a single value.
+
+## Void functions
