@@ -71,3 +71,6 @@ Compilation are translated into binary code and then run
 
 ## Higher-order function
 A function where another function is passed as a parameter or returns another function. Sca 
+
+## CMake
+CMake is an open-source, cross-platform software development tool that uses compiler-independent and platform-independent configuration files to generate native build tool files specific to your compiler and platform. It is used for build automation, testing, packaging and installing the software. It is not a build system itself but generates another system's build files. It is used in conjunction with native build environments such as Visual Studio, Make, Qt Creator, Ninja, Android Studio, Apple's Xcode, etc.
