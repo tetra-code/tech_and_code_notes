@@ -548,9 +548,7 @@ Functions should be minimal and only perform one type of action. If you see a bl
 ```
 
 ## Return
-C++ has a garbage collector for memory management. When a function terminates, all the value entered inside that function is lost. To save any data from that function, we have the *return* keyword to return a value or data. You can use that value in an expression or statement (by assigning to a variable or sending it somewhere). Otherwise it will be ignored. 
-
-Of course we must save that returned value by assigning a variable to it. Otherwise it will get lost.
+C++ has a garbage collector for memory management. When a function terminates, all the value entered inside that function is lost. To save any data from that function, we have the *return* keyword to return a value or data. You can use that value in an expression or statement (by assigning to a variable or sending it somewhere). Otherwise it will be ignored. Functions with a return type are called *value-returning function*.
 
 ```
 #include <iostream>
@@ -575,7 +573,163 @@ int main()
 ```
 
 In the main function, a status code of 0 means the program executed successfully. 
-
 In C++, a function can only return a single value.
+*Early returns* are perfectly legal in C++:
+
+```
+#include <iostream>
+
+int print() // note: return type of int
+{
+    std::cout << "A";
+    return 5; // the function will return to the caller here
+    std::cout << "B"; // this will never be printed
+}
+
+int main()
+{
+    std::cout << print(); // print() returns value 5, which will be print to the console
+
+    return 0; // the final print is 'A5'
+}
+```
 
 ## Void functions
+Functions that don't return a value are called *non-value returning function*. Technically you can put an empty return statement at the end of a void function but of course this is redundant. You will almost never see this in real life codes and only in theoretical exams.
+
+```
+#include <iostream>
+
+// void means the function does not return a value to the caller
+void printHi()
+{
+    std::cout << "Hi" << '\n';
+
+    return; // tell compiler to return to the caller -- this is redundant since this will happen anyway!
+} 
+
+int main()
+{
+    printHi();
+
+    return 0;
+}
+```
+
+*Trying to return a value from a non-value returning function will result in a compilation error.
+
+When we call a function in a context that requires a value (e.g. std::cout), a value must be provided. In such a context, we can only call value-returning functions. The compiler will throw an error if a value is not provided.  
+
+```
+void printHi()
+{
+    std::cout << "Hi" << '\n';
+}
+
+int main()
+{
+    std::cout << 5;             // ok: 5 is a literal value that we're sending to the console to be printed
+    std::cout << ;              // compile error: no value provided
+    std::cout << printHi();     // compile error: no value provided
+    return 0;
+}
+```
+
+## Parameter and Argument
+A function *parameter* is a variable used in a function. They are always initialized with a value provided by the caller of the function. This value is called an *argument*.
+
+When a function is called, all of the parameters of the function are created as variables, and the value of each of the arguments is copied into the matching parameter. This process is called *pass by value*.
+
+Sometimes, you may only use a variable once to hold a return value and then pass that variable's value to another function. In that case you can directly use the return value of the function as an argument to another function:
+
+```
+    printDouble(getValueFromUser());
+```
+
+This may be more compact a bit harder to read. If you think your code is going to be read often by other developers, you should first initalize the return value to a variable and then pass it as an argument. You can also save space by directly returning the value of the expression:
+
+```
+    int add(int x, int y)
+    {
+        return x + y;
+    }
+```
+
+The following statements are all valid:
+
+```
+    std::cout << add(1, multiply(2, 3)) << '\n';    // evaluates 1 + (2 * 3)
+    std::cout << add(1, add(2, 3)) << '\n';         // evaluates 1 + (2 + 3)
+```
+
+## Local scope
+Function parameters and variables defined inside the function body are called *local variables*. As mentioned before, the local variables are garbage collected when the function ends, in the opposite order of creation.
+
+```
+    int add(int x, int y) // function parameters x and y are local variables, created and initialized here
+    {
+        int z{ x + y }; // z is a local variable too, created and initialized here
+
+        return z;
+    } // z, y, and x destroyed here
+```
+
+An object’s *lifetime* is defined to be the time between its creation and destruction. Variable creation and destruction happen during the program's runtime, not at compile time. Therefore, *lifetime is a runtime property*.
+
+*The C++ specification gives compilers a lot of flexibility to determine when local variables are created and destroyed. Objects may be created earlier, or destroyed later for optimization purposes. Most often, local variables are created when the function is entered, and destroyed in the opposite order of creation when the function is exited.
+
+An identifier’s scope determines where the identifier can be accessed within the source code. When an identifier can be accessed, we say it is *in scope*. When an identifier can not be accessed, we say it is *out of scope*. While a lifetime is a runtime property, a scope is a compile-time property.
+
+```
+    #include <iostream>
+
+    int add(int x, int y) // x and y are created and enter scope here
+    {
+        // x and y are visible/usable within this function only
+        return x + y;
+    } // y and x go out of scope and are destroyed here
+
+    int main()
+    {
+        int a{ 5 }; // a is created, initialized, and enters scope here
+        int b{ 6 }; // b is created, initialized, and enters scope here
+
+        std::cout << add(a, b) << '\n'; // calls function add() with x=5 and y=6
+
+        return 0;
+    } // b and a go out of scope and are destroyed here
+```
+*note that variables a and b are different variables from x and y.
+
+An identifier is “out of scope” anywhere it can not be accessed within the code. The term “going out of scope” is typically applied to objects rather than identifiers. We say an object “goes out of scope” at the end of the scope (the end curly brace) in which the object was instantiated. 
+
+Note that not all types of variables are destroyed when they *go out of scope*.
+
+If a function was to be called twice, the parameters x and y would be created and destroyed twice -- once for each call. 
+
+The following program, the 'add' variables x, y are distinct from 'main' variables x, y. Even though they have the same name, they have different scopes and just happen to share the same name.  
+
+```
+#include <iostream>
+
+int add(int x, int y) // add's x and y are created and enter scope here
+{
+    // add's x and y are visible/usable within this function only
+    return x + y;
+} // add's y and x go out of scope and are destroyed here
+
+int main()
+{
+    int x{ 5 }; // main's x is created, initialized, and enters scope here
+    int y{ 6 }; // main's y is created, initialized, and enters scope here
+
+    // main's x and y are usable within this function only
+    std::cout << add(x, y) << '\n'; // calls function add() with x=5 and y=6
+
+    return 0;
+} // main's y and x go out of scope and are destroyed here
+```
+
+Names used for function parameters or variables declared in a function body are only visible within the function that declares them. This means local variables within a function can be named without regard for the names of variables in other functions. This helps keep functions independent. 
+
+As a general rule of thumb: local variables inside the function body should be defined as close to their first use as reasonable:
