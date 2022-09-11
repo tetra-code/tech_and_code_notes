@@ -497,8 +497,8 @@ Using the automatic formatting feature is highly recommended to keep your code�
 A *literal* or a *constant* is a fixed value that has been directly inserted into the source code. Literals can't be changed while variable value's can be changed through initialization and assignment.
 
 ```
-std::cout << "Hello world!";  // Hello world! is a literal
-int x{ 5 };                   // 5 is a literal
+    std::cout << "Hello world!";  // Hello world! is a literal
+    int x{ 5 };                   // 5 is a literal
 ```
 
 Operators in C++ come in four different arities:
@@ -578,25 +578,25 @@ Functions should be minimal and only perform one type of action. If you see a bl
 C++ has a garbage collector for memory management. When a function terminates, all the value entered inside that function is lost. To save any data from that function, we have the *return* keyword to return a value or data. You can use that value in an expression or statement (by assigning to a variable or sending it somewhere). Otherwise it will be ignored. Functions with a return type are called *value-returning function*.
 
 ```
-#include <iostream>
+    #include <iostream>
 
-int getValueFromUser() // this function now returns an integer value
-{
- 	std::cout << "Enter an integer: ";
-	int input{};
-	std::cin >> input;
+    int getValueFromUser() // this function now returns an integer value
+    {
+        std::cout << "Enter an integer: ";
+        int input{};
+        std::cin >> input;
 
-	return input; // return the value the user entered back to the caller
-}
+        return input; // return the value the user entered back to the caller
+    }
 
-int main()
-{
-	int num { getValueFromUser() }; // initialize num with the return value of getValueFromUser()
+    int main()
+    {
+        int num { getValueFromUser() }; // initialize num with the return value of getValueFromUser()
 
-	std::cout << num << " doubled is: " << num * 2 << '\n';
+        std::cout << num << " doubled is: " << num * 2 << '\n';
 
-	return 0;
-}
+        return 0;
+    }
 ```
 
 In the main function, a status code of 0 means the program executed successfully. 
@@ -604,43 +604,43 @@ In C++, a function can only return a single value.
 *Early returns* are perfectly legal in C++:
 
 ```
-#include <iostream>
+    #include <iostream>
 
-int print() // note: return type of int
-{
-    std::cout << "A";
-    return 5; // the function will return to the caller here
-    std::cout << "B"; // this will never be printed
-}
+    int print() // note: return type of int
+    {
+        std::cout << "A";
+        return 5; // the function will return to the caller here
+        std::cout << "B"; // this will never be printed
+    }
 
-int main()
-{
-    std::cout << print(); // print() returns value 5, which will be print to the console
+    int main()
+    {
+        std::cout << print(); // print() returns value 5, which will be print to the console
 
-    return 0; // the final print is 'A5'
-}
+        return 0; // the final print is 'A5'
+    }
 ```
 
 ## Void functions
 Functions that don't return a value are called *non-value returning function*. Technically you can put an empty return statement at the end of a void function but of course this is redundant. You will almost never see this in real life codes and only in theoretical exams.
 
 ```
-#include <iostream>
+    #include <iostream>
 
-// void means the function does not return a value to the caller
-void printHi()
-{
-    std::cout << "Hi" << '\n';
+    // void means the function does not return a value to the caller
+    void printHi()
+    {
+        std::cout << "Hi" << '\n';
 
-    return; // tell compiler to return to the caller -- this is redundant since this will happen anyway!
-} 
+        return; // tell compiler to return to the caller -- this is redundant since this will happen anyway!
+    } 
 
-int main()
-{
-    printHi();
+    int main()
+    {
+        printHi();
 
-    return 0;
-}
+        return 0;
+    }
 ```
 
 *Trying to return a value from a non-value returning function will result in a compilation error.
@@ -648,18 +648,18 @@ int main()
 When we call a function in a context that requires a value (e.g. std::cout), a value must be provided. In such a context, we can only call value-returning functions. The compiler will throw an error if a value is not provided.  
 
 ```
-void printHi()
-{
-    std::cout << "Hi" << '\n';
-}
+    void printHi()
+    {
+        std::cout << "Hi" << '\n';
+    }
 
-int main()
-{
-    std::cout << 5;             // ok: 5 is a literal value that we're sending to the console to be printed
-    std::cout << ;              // compile error: no value provided
-    std::cout << printHi();     // compile error: no value provided
-    return 0;
-}
+    int main()
+    {
+        std::cout << 5;             // ok: 5 is a literal value that we're sending to the console to be printed
+        std::cout << ;              // compile error: no value provided
+        std::cout << printHi();     // compile error: no value provided
+        return 0;
+    }
 ```
 
 ## Parameter and Argument
@@ -737,24 +737,24 @@ If a function was to be called twice, the parameters x and y would be created an
 The following program, the 'add' variables x, y are distinct from 'main' variables x, y. Even though they have the same name, they have different scopes and just happen to share the same name.  
 
 ```
-#include <iostream>
+    #include <iostream>
 
-int add(int x, int y) // add's x and y are created and enter scope here
-{
-    // add's x and y are visible/usable within this function only
-    return x + y;
-} // add's y and x go out of scope and are destroyed here
+    int add(int x, int y) // add's x and y are created and enter scope here
+    {
+        // add's x and y are visible/usable within this function only
+        return x + y;
+    } // add's y and x go out of scope and are destroyed here
 
-int main()
-{
-    int x{ 5 }; // main's x is created, initialized, and enters scope here
-    int y{ 6 }; // main's y is created, initialized, and enters scope here
+    int main()
+    {
+        int x{ 5 }; // main's x is created, initialized, and enters scope here
+        int y{ 6 }; // main's y is created, initialized, and enters scope here
 
-    // main's x and y are usable within this function only
-    std::cout << add(x, y) << '\n'; // calls function add() with x=5 and y=6
+        // main's x and y are usable within this function only
+        std::cout << add(x, y) << '\n'; // calls function add() with x=5 and y=6
 
-    return 0;
-} // main's y and x go out of scope and are destroyed here
+        return 0;
+    } // main's y and x go out of scope and are destroyed here
 ```
 
 Names used for function parameters or variables declared in a function body are only visible within the function that declares them. This means local variables within a function can be named without regard for the names of variables in other functions. This helps keep functions independent. 
@@ -1160,21 +1160,21 @@ Consider the case of a type alias, which allows us to define a new name for an e
 The definition doesn't create an object but merely tells the compiler what a *length* is. This is also true for *user-defined types* and its definition is called *type definition*. Below we first define what a *Fraction* is and then instantiate it in the *main* class.
 
 ```
-// Define a program-defined type named Fraction so the compiler understands what a Fraction is
-// This only defines what a Fraction type looks like, it doesn't create one
-struct Fraction
-{
-	int numerator {};
-	int denominator {};
-};
+    // Define a program-defined type named Fraction so the compiler understands what a Fraction is
+    // This only defines what a Fraction type looks like, it doesn't create one
+    struct Fraction
+    {
+        int numerator {};
+        int denominator {};
+    };
 
-// Now we can make use of our Fraction type
-int main()
-{
-	Fraction f{ 3, 4 }; // this actually instantiates a Fraction object named f
+    // Now we can make use of our Fraction type
+    int main()
+    {
+        Fraction f{ 3, 4 }; // this actually instantiates a Fraction object named f
 
-	return 0;
-}
+        return 0;
+    }
 ```
 
 Don’t forget to end your type definitions with a semicolon, otherwise the compiler will typically error on the next line of code. For example, if you remove the semicolon from the end of the Fraction definition (line 8) of the example above, the compiler will probably complain about the definition of main() (line 11).
@@ -1186,19 +1186,19 @@ Every code file that uses a program-defined type needs to see the full type defi
 As mentioned before, program-defined types are typically defined in header files, and then *#included* into any code file that requires that type definition. These header files are typically given the same name as the program-defined type
 
 ```
-#ifndef FRACTION_H
-#define FRACTION_H
+    #ifndef FRACTION_H
+    #define FRACTION_H
 
-// Define a new type named Fraction
-// This only defines what a Fraction looks like, it doesn't create one
-// Note that this is a full definition, not a forward declaration
-struct Fraction
-{
-	int numerator {};
-	int denominator {};
-};
+    // Define a new type named Fraction
+    // This only defines what a Fraction looks like, it doesn't create one
+    // Note that this is a full definition, not a forward declaration
+    struct Fraction
+    {
+        int numerator {};
+        int denominator {};
+    };
 
-#endif
+    #endif
 ```
 
 User-defined types are exempt from the *one-definition* rule and can be propagated to multiple files.
@@ -1252,27 +1252,27 @@ Each enumerated type you create is considered to be a distinct type, meaning the
 Enums have a variety of good uses, such as error codes or game items:
 
 ```
-enum FileReadResult
-{
-    readResultSuccess,
-    readResultErrorFileOpen,
-    readResultErrorFileRead,
-    readResultErrorFileParse,
-};
+    enum FileReadResult
+    {
+        readResultSuccess,
+        readResultErrorFileOpen,
+        readResultErrorFileRead,
+        readResultErrorFileParse,
+    };
 
-enum ItemType
-{
-    sword,
-    torch,
-    arrow,
-};
+    enum ItemType
+    {
+        sword,
+        torch,
+        arrow,
+    };
 
-enum SortOrder
-{
-    alphabetical,
-    alphabeticalReverse,
-    numerical,
-}
+    enum SortOrder
+    {
+        alphabetical,
+        alphabeticalReverse,
+        numerical,
+    }
 ```
 
 While many languages use enums to define Booleans, C++ define Booleans as keywords instead of enums.
@@ -1280,19 +1280,19 @@ While many languages use enums to define Booleans, C++ define Booleans as keywor
 If th ere are two enumerators of the same name in the same scope, this leads to a naming collision and a compile error. 
 
 ```
-enum Color
-{
-    red,
-    green,
-    blue, // blue is put into the global namespace
-};
+    enum Color
+    {
+        red,
+        green,
+        blue, // blue is put into the global namespace
+    };
 
-enum Feeling
-{
-    happy,
-    tired,
-    blue, // error: naming collision with the above blue
-};
+    enum Feeling
+    {
+        happy,
+        tired,
+        blue, // error: naming collision with the above blue
+    };
 ```
 
 To avoid naming collisons:
@@ -1509,7 +1509,7 @@ Just like printing enumerator, we can also accept inputs as enums. Since enums a
 Teach the *operator>>* how to input an enum type:
 
 ```
-#include <iostream>
+    #include <iostream>
 
     enum Pet
     {
@@ -1549,3 +1549,265 @@ If you typically access a sequence of back-to-back objects using a pointer and a
 The size of a span can be set at compile time by specifying it as a template argument, or at runtime by specifying dynamic_extent.
 
 Unlike array or vector, a span doesn't "own" the elements inside it. A span doesn't free any storage for the items inside it because it doesn't own the storage for those objects.
+
+# Chapter 11
+
+## std::array
+Both *fixed arrays* and *dynamic arrays* are built right into C++ and come with downsides: Fixed arrays decay into pointers losing the array length information when they do, and dynamic arrays have messy deallocation issues and are challenging to resize without error. To use array with ease, the C++ standard library includes std::array and std::vector. 
+
+std::array provides fixed array functionality that won’t decay when passed into a function. std::array is defined in the <array> header, inside the std namespace. Just like the native fixed arrays, the length of the std::array must be known at compile time. The std::array can be initialized using the *initializer list* or *list initialization*. Since C++17, you can omit the type and size together but not one or the other, and only if the array is explicitly initialized. You can also assign values to the array using an initializer list:
+
+```
+    #include <array>
+
+    std::array<int, 3> myArray;                         // declare an integer array with length 3
+    std::array<int, 5> myArray1 = { 9, 7, 5, 3, 1 };    // initializer list
+    std::array<int, 5> myArray2 { 9, 7, 5, 3, 1 };      // list initialization
+    std::array<int, > myArray3 { 9, 7, 5, 3, 1 };       // illegal, array length must be provided
+    std::array<int> myArray4 { 9, 7, 5, 3, 1 };         // illegal, array length must be provided
+    std::array myArray5 { 9, 7, 5, 3, 1 };              // The type is deduced to std::array<int, 5>
+    std::array myArray6 { 9.7, 7.31 };                  // The type is deduced to std::array<double, 2>
+    std::array<int, 5> myArray7;                        // declare an array
+    myArray7 = { 9, 7, 5, 3, 1 }                        // assign using initializer list
+```
+
+If the compiler is before C++17, then explicit syntax of type and size is required. Since C++20, it is possible to specify the element type but omit the array length. This makes creation of std::array a little more like creation of C-style arrays. To create an array with a specific type and deduced size, we use the std::to_array function. The downside is it's expensive because it actually copies all elements from the C-style array to a std::array. Therefore, avoid it when array is created many times (like in a loop)
+
+```
+    auto myArray1 { std::to_array<int, 5>({ 9, 7, 5, 3, 1 }) }; // Specify type and size
+    auto myArray2 { std::to_array<int>({ 9, 7, 5, 3, 1 }) };    // Specify type only, deduce size
+    auto myArray3 { std::to_array({ 9, 7, 5, 3, 1 }) };         // Deduce type and size
+```
+
+Like built-in fixed arrays, the *subscript operator[]* doesn't do any bounds-checking. The at() function, however, does. It may be slower than the subscript operator but definitely safer:
+
+```
+    #include <array>
+
+    std::array myArray { 9, 7, 5, 3, 1 };   // initialized using list initialization
+    myArray.at(1) = 6;                      // array element 1 is valid, sets array element 1 to value 6
+    myArray.at(9) = 10;                     // array element 9 is invalid, will throw a runtime error
+```
+
+std::array will clean up after itself when it goes out of scope, so there’s no need to do any kind of manual cleanup.
+
+The size() function is used to retrieve the length of the std::array. Because std::array doesn’t decay to a pointer when passed to a function, the size() function will work even if you call it from within a function:
+
+```
+    #include <array>
+    #include <iostream>
+
+    void printLength(const std::array<double, 5>& myArray)
+    {
+        std::cout << "length: " << myArray.size() << '\n';
+    }
+
+    int main()
+    {
+        std::array myArray { 9.0, 7.2, 5.4, 3.6, 1.8 };
+
+        printLength(myArray);
+
+        return 0;
+    }
+```
+
+Note that we passed std::array by (const) reference. This is to prevent the compiler from making a copy of the std::array when the std::array was passed to the function (for performance reasons). Therefore it is good practice to *pass std::array by reference or const reference*
+
+Because length is always known, range-based for-loops work with std::array. You can even sort it using std::sort, which is inside the <algorithm> header.
+
+```
+    #include <algorithm>
+    #include <array>
+    #include <iostream>
+
+    void printArray(const std::array<int, 5>& myArray)
+    {
+        for (int element : myArray)
+            std::cout << element << ' ';
+        std::cout << '\n';  
+    }
+
+    int main()
+    {
+        std::array myArray { 7, 3, 1, 9, 5 };
+
+        std::sort(myArray.begin(), myArray.end());      // sort the array forwards
+        printArray(myArray);                            // prints 1 3 5 7 9
+
+        std::sort(myArray.rbegin(), myArray.rend());    // sort the array backwards
+        printArray(myArray);                            // prints 9 7 5 3 1
+
+        return 0;
+    }
+```
+
+Handling of std::array is specific to its type and length (as shown above in the printArray function). If we want a function that can handle arrays of different types or lengths, that requires lots of deep copying. We can create a template function that parmeterizes part or all of the type information and C++ will use that template to create "real" functions with actual types as needed:
+
+```
+    #include <algorithm>
+    #include <array>
+    #include <iostream>
+
+    template <typename T, std::size_t size>             // parameterize the element typename as T, size_t as size
+    void printArray(const std::array<T, size>& myArray) // function will be created with various types when called
+    {
+        for (int element : myArray)
+            std::cout << element << ' ';
+        std::cout << '\n';  
+    }
+
+    int main()
+    {
+        std::array myArray5{ 9.0, 7.2, 5.4, 3.6, 1.8 };
+        printArray(myArray5);
+
+        std::array myArray7{ 9.0, 7.2, 5.4, 3.6, 1.8, 1.2, 0.7 };
+        printArray(myArray7);
+
+        return 0;
+    }
+
+```
+
+Remember that in C++, 'size_type' is an unsigned integral type. But the regular 'int' type we see is a signed integral type. Therefore, a typical for-loop condition 'int i{ 0 }; i < myArray.size();' and the array index 'myArray[i]'  will have a mismatch. Interestingly enough, 'size_type' isn’t a global type (like int or std::size_t). Rather, it’s defined inside the definition of std::array. But to generally avoid all this complication, it's recommended to avoid manual indexing of std::array in the first place. Instead, use range-based for-loops (or iterators) if possible.
+
+```
+    #include <iostream>
+    #include <array>
+
+    int main()
+    {
+        std::array myArray { 7, 3, 1, 9, 5 };
+
+        // throws an error due to type mismatch
+        for (int i{ 0 }; i < myArray.size(); ++i)  
+            std::cout << myArray[i] << ' ';
+
+        // std::array<int, 5>::size_type is the return type of size()!
+        for (std::array<int, 5>::size_type i{ 0 }; i < myArray.size(); ++i) 
+            std::cout << myArray[i] << ' ';
+
+        // more readable form
+        for (std::size_t i{ 0 }; i < myArray.size(); ++i)
+            std::cout << myArray[i] << ' ';
+
+        std::cout << '\n';
+
+        return 0;
+    }
+```
+
+*read more about for-loops in C++ and arrays*
+
+std::array can also be used with program-defined types like a struct. But things get a little weird when we try to initialize an array whose element type requires a list of values. The following doesn't work because a std::array is defined as a struct that contains a C-style array member: 
+
+```
+    struct House
+    {
+        int number{};
+        int stories{};
+        int roomsPerStory{};
+    };
+
+    int main() 
+    {
+        // Doesn't work.
+        std::array<House, 3> houses {   // initializer for houses
+            { 13, 4, 30 },              // initializer for the C-style array member inside the std::array struct
+            { 14, 3, 10 },              // ?
+            { 15, 3, 40 }               // ?
+        };
+    }
+```
+
+So when we try to initialize an array whose element type requires a list of values, we need an extra set of braces to initialize the C-style array member inside the std::array struct:
+
+```
+    struct House
+    {
+        int number{};
+        int stories{};
+        int roomsPerStory{};
+    };
+
+    int main() 
+    {
+        // This works as expected
+        std::array<House, 3> houses {                               // initializer for houses
+            {                                                       // initialize the C-style array member inside the std::array struct
+                { 13, 4, 30 },                                      // initializer for array element 0
+                { 14, 3, 10 },                                      // initializer for array element 1
+                { 15, 3, 40 },                                      // initializer for array element 2
+            }
+        };
+    }
+```
+std::array is a great improvement over the built-in fixed arrays but requires slightly more awkward syntax, that you have to explicitly specify the array length (the compiler won’t calculate it for you from the initializer, unless you also omit the type, which isn’t always possible), and the signed/unsigned issues with size and indexing. An even better data structure is std::vector.
+
+## std::vector
+This data structure provides dynamic array functionality that handles its own memory managment. This lets you set the length of the array at runtime without explicitly allocating memory for it. In addition, no need to declare the array data type since C++17. Just like std::array, accessing array elements can be done via [] or the .at() function. The latter checks for bounds while the former doesn't. In either case if you request an element that is off the end of the array, the vector will not automatically resize.
+
+```
+    #include <vector>
+    // no need to specify length at the declaration
+    std::vector<int> array;
+    std::vector<int> array2 = { 9, 7, 5, 3, 1 }; // use initializer list to initialize array (before C++11)
+    std::vector<int> array3 { 9, 7, 5, 3, 1 }; // use uniform initialization to initialize array
+
+    // as with std::array, the type can be omitted since C++17
+    std::vector array4 { 9, 7, 5, 3, 1 }; // deduced to std::vector<int>
+
+    array[6] = 2; // no bounds checking
+    array.at(7) = 3; // does bounds checking
+```
+
+A vector is much safter to use than doing your own memory allocation. When a vector variable goes out of scope, it automatically deallocates the memory it controls (if necessary). This is not only handy (as you don’t have to do it yourself), it also helps prevent memory leaks. Consider the following snippet:
+
+```
+    void doSomething(bool earlyExit)
+    {
+        int* array{ new int[5] { 9, 7, 5, 3, 1 } }; // allocated memory using new
+
+        if (earlyExit)
+            return; // exits the function without deallocating the memory allocated above
+
+        // do stuff here
+
+        delete[] array; // never called
+    }
+```
+
+If earlyExit is set to true, array will never be deallocated, and the memory will be leaked. This will won't happen if array is instead a std::vector.
+
+There are a lot more useful features with std::vector that built-in dynamic arrays don't have. std::vector keeps track of its length and this can be accessed via the size() function. It will return a value of nested type *size_type*, which is an unsigned intteger. Resizing a std::vector is also simple and can be done by calling the resize() function. The existing elements will be preserved. If you increase it, new elements will be initialized to the default value type of the array (for ints this is 0). If you decrease it, it will remove the elements until the resized length.
+
+```
+    #include <vector>
+    #include <iostream>
+
+    int main()
+    {
+        std::vector array1 { 0, 1, 2, 3, 4 };
+        std::vector array2 { 0, 1, 2 };
+        array1.resize(3);                       // set size to 3
+        array2.resize(5)                        // set size to 5
+
+        std::cout << array1.size();             // prints 3
+        std::cout << array2.size();             // prints 5
+        for (int i : array1)
+            std::cout << i << ' ';
+        std::cout << '\n';                      // prints 0 1 2
+        for (int i : array2)
+            std::cout << i << ' ';
+        std::cout << '\n';                      // prints 0 1 2 0 0
+
+        return 0;
+    }
+```
+
+Keep in mind  that resizing is computationally expensive and thus should be minimized. A rule of thumb is, if the type is some kind of list and you don’t want to initialize it with a list, use direct initialization.
+
+There is a special implementation for std::vector of  type bool. It can compact 8 booleans into a byte.
+
+# Chapter 12
