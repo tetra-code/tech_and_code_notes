@@ -64,10 +64,16 @@ It also mutates the program's state.
 Functional programming is a paradigm that considers computation as the evaluation of mathematical functions. Functional programming is composing the problem as a set of functions to be executed. Unlike IP it avoids changing state and mutable data.
 
 ## Interpreted vs Compiled languages
-Interpretation are reading code line by line and then executed
+Interpreted programming languages comes with an interpreter. The interpreter reads the code line by line and converts it into CPU instructions and the CPU executes them. Examples include Python and JavaScript.
 
+Compiled languages come in two forms: 
 
-Compilation are translated into binary code and then run
+- compiled in byte code via Virtual Machine 
+- compiled to native instructions  
+
+For byte code compilation, the compiler converts (compiles) the code into byte code (a basic CPU agnostic instruction set). In runtime, this byte code is converted into CPU specific instructions and the CPU executes them. Example includes Java.
+
+For native instruction compilation, the compiler converts (compiles) the code into CPU specific instruction sets and the CPU executes them. This method requires recompilation for each different CPU architecture and OS. Example includes C++.
 
 ## Higher-order function
 A function where another function is passed as a parameter or returns another function. Sca 

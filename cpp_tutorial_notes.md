@@ -762,6 +762,381 @@ Names used for function parameters or variables declared in a function body are 
 As a general rule of thumb: local variables inside the function body should be defined as close to their first use as reasonable:
 
 
+## Naming collisions and Namespaces
+Most naming collisions occur in two cases:
+- Two (or more) definitions for a function (or global variable) are introduced into separate files that are compiled into the same program. This will result in a *linker error*
+- Two (or more) definitions for a function (or global variable) are introduced into the same file (often via an #include). This will result in a *compiler error*
+
+To prevent function identifiers from conflicting with each other, we use a namespace. A *namespace* is a region that allows you to declare names inside of it for the purpose of disambiguation. The namespace provides a scope region (called namespace scope) to the names declared inside of it. Any name declared inside the namespace won’t be mistaken for identical names in other scopes. Of course within the namespace itself, all names must be unique or a naming collision will occur.
+
+Any name that is not defined inside a class, function, or a namespace is considered to be part of the *global namespace* or *global scope*. The compiler forbids executable expression statements in the global namespace:
+
+```
+    // All of the following statements are part of the global namespace
+    void foo();    // okay: function forward declaration in the global namespace
+    int x;         // compiles but strongly discouraged: uninitialized variable definition in the global namespace
+    int y { 5 };   // compiles but discouraged: variable definition with initializer in the global namespace
+    x = 5;         // compile error: executable statements not allowed in the global namespace
+```
+
+The name *std::cout* isn't really std::cout. *cout* is the name of the function, and *std* is the name of the namespace that identifier cout is part of. Because cout is defined in the std namespace, the name cout won’t conflict with any objects or functions named cout that we create in the global namespace.
+
+When accessing an identifier in a specific namespace (e.g. std::cout), you need to tell the compiler that we’re looking for an identifier defined inside the namespace (std).  
+
+The :: symnbol is called the *scope resolution operator*. If no identifier to the left of :: is provided, it assumes the global namespace. This is safest and recommended way of using functions with specific namespaces. When an identifier includes a namespace prefix, the identifier is called a *qualified name*. 
+
+A way to access identifiers inside a namespace without a prefix is *using directive statement* but this is highly discouraged as if you have another cout function in this file, the compiler won't know which one you are referring to. 
+
+```
+    #include <iostream>
+
+    using namespace std; // this is a using directive
+
+    int main()
+    {
+        cout << "Hello world!";
+        return 0;
+    }
+```
+
+# Chapter 9
+
+## Compound Data Types
+Compound data types are data types that can be made from fundamental or other compound data types. C++ has the following compound types:
+
+- Functions
+- Arrays
+- Pointer types:
+    Pointer to object
+    Pointer to function
+- Pointer to member types:
+    Pointer to data member
+    Pointer to member function
+- Reference types:
+    L-value references
+    R-value references
+- Enumerated types:
+    Unscoped enumerations
+    Scoped enumerations
+- Class types:
+    Structs
+    Classes
+    Unions
+
+## Lvalues and Rvalues
+The compiler can determine what type the result of the expression will output. This can be done with the *auto*  keyword which automatically detects and assigns a data type to the variable with which it is used.
+
+```
+    int main()
+    {
+        auto v1 { 12 / 4 }; // int / int => int
+        auto v2 { 12.0 / 4 }; // double / int => double
+
+        return 0;
+    }
+```
+
+While the type of an expression must be known at compile time, the value of an expression may be determined at either compile time or runtime. The compiler determines which expressions can legally appear on either side of an assignment statment using the *value category* property of a statement. The *value category* of an expression indicates whether an expression resolves to a value, a function, or an object.
+
+There are two main value categories (actually 5 but these 2 are most relevant):
+
+- lvalue
+- rvalue
+
+An *Lvalue* is also known as a *locator value* that evaluates to a function or object that has an identity. It comes in two subtypes:
+
+- modifiable lvalue - the value can be modified
+- non-modifiable lvalue - the value can't be modified (because the lvalue is a const or constexpr)
+
+An *Rvalue* is an expression that is not an Lvalue. Rvalues only exist within the scope of the expression in which they are used. Common rvalues are:
+
+- literals (except Cstyle string literals)
+- return values of functions or operators
+
+```
+    #include <iostream>
+
+    int main() 
+    {
+        int x{};
+        const double d{};
+        int y { 3 }; // 3 is an rvalue expression
+
+        std::cout << x << '\n';                     // x is a modifiable lvalue expression
+        std::cout << x + 1 << '\n';                 // value only exist in this scope, thus rvalue
+        std::cout << d << '\n';                     // d is a non-modifiable lvalue expression
+        std::cout << return5() << '\n';             // value only exist in this scope, thus rvalue
+        std::cout << static_cast<int>(d) << '\n';   // result of static casting d to an int is an rvalue
+        
+        5 = x; // error: 5 is an rvalue expression and x is a modifiable lvalue expression
+
+        return 0;
+    }
+```
+
+'x = 5' is valid but '5 = x' is not. This is because an assignment operation requires the left operand of the assignment to be a modifiable lvalue expression and right operatnd to be an rvalue expression. 
+
+Lvalues can be implicitely converted to rvalues, which is why the following works:
+
+```
+    int main() 
+    {
+        int x { 1 };
+        int y { 2 };
+        x = y;
+
+        return 0;
+    }
+```
+
+lvalues expressions are those that evaluate to variables or other identifiable objects that *persist beyond the end of the expression*.
+rvalues expressions are those that evaluate to literals or the returned value of functions and operators that are *discarded at the end of the expression*.
+
+## References
+As you already know, reference is an alias for an existing object. There are two types of references:
+
+- lvalue references
+- rvalue references
+
+## Lvalue references
+Lvalue references are used to alias already existing lvalues (like variables) and use an ampersand. It doesn't matter whether the ampersand is attached to the type name (int) or the variable's name. Most C++ programmers nowadays prefer attaching the ampersand to the type name. 
+
+The variables used to reference another existing object are called *reference variables* and they have the same scoping and duration rules as normal variables do. But references themselves are not objects (in C++) as they don't require to exist or occupy memory; if possible the compiler will replace all occurence of the reference will the actual object it is referencing (called *referent*). Note that this is NOT ALWAYS possible and references may require storage after all.
+
+Like constants, all references must be initialized. When a reference is initialized with an object (or function), we say it is bound to that object (or function). The process by which such a reference is bound is called *reference binding*. Since we are talking about references, changing the value of the object being referenced will also reflect on the reference variable (and vice versa). Below, 'ref' and 'x' can be used synonymously:
+
+```
+    #include <iostream>
+
+    int main()
+    {
+        int& invalidRef; //error, needs to be initialized
+
+        int x { 5 };    // x is a normal integer variable
+        int& ref { x }; // ref is an lvalue reference variable, now be used as an alias for variable x
+
+        std::cout << x << '\n';  // print the value of x (5)
+        std::cout << ref << '\n'; // print the value of x via ref (5)
+
+        x = 6;
+        std::cout << x << '\n';  // print the value of x (6)
+        std::cout << ref << '\n'; // print the value of x via ref (6)
+
+        ref = 7;
+        std::cout << x << '\n';  // print the value of x (7)
+        std::cout << ref << '\n'; // print the value of x via ref (7)
+
+        return 0;
+    }
+```
+
+Keep in mind that Lvalue references can't reference all types of Lvalues; unmodifiable Lvalues can't be binded as you’d be able to change those values through the reference, which would violate their unmodifable property. In addition, the type of the reference must match the type of the lvalue being referenced:
+
+```
+int main()
+{
+    const int x { 5 };
+    double y { 3.23 };
+    int& invalidRef { x };  // error: can't bind to non-modifiable lvalue
+    int& invalidRef2 { 0 }; // error: can't bind to an rvalue
+    int& invalidRef3 { y }; // error: reference to int can't bind to an lvalue of type double
+}
+```
+
+Once a reference is initilaized, it can NOT be changed to reference some other lvalue. This will not throw an error but not work as the programmer intended. Instead of changing the reference to another lvalue, it will instead reassign the original refereneced lvalue to the  value of the new referenced lvalue:
+
+```
+    #include <iostream>
+
+    int main()
+    {
+        int x { 5 };
+        int y { 6 };
+
+        int& ref { x }; // ref is now an alias for x
+
+        ref = y; // assigns 6 (the value of y) to x (the object being referenced by ref)
+
+        std::cout << x << '\n'; // user is expecting this to print 5 but instead print 6
+
+        return 0;
+    }
+```
+
+The lifetime of a reference is independent from the lifetime of the referent (object it is referencing). This means that the reference can be destroyed before the referent, and vice versa. If the reference is destroyed first, this won't impact the referent. If the referent is destroyed first, the reference is left dangling and it is called a *dangling reference*. This will lead to undefined behavior.
+
+As mentioned before, references aren't objects thus a reference can't reference another reference (lvalue reference is required to reference an identifiable object). It won't throw an error but not behave as you intended:
+
+```
+    int var{};
+    int& ref1{ var };  // an lvalue reference bound to var
+    int& ref2{ ref1 }; // an lvalue reference bound to var
+```
+
+It is however possible to make a reference an object or a reference that can be reseated via a *std::reference_wrapper* but that's for later
+
+## Pointers
+A *pointer* is an object that holds a memory address as its value. This is typically the memory address of another variable. 
+
+Quick summary about memory address and accessing them:
+
+For variables, we don't have to worry about what specific memory addresses are assigned or how many bytes are required to store the object's value. The compiler translates this name into the appropriately assigned memory address. The same goes for references since they are an alias to the object and the mentioning the reference will point to the same memory address as the object.
+
+The memory address isn't exposed to us explicitely but this information can be accessed with the *address-of operator* &.
+
+*The ampersand symbol has different meanings depending on the context:
+- When following a type name, & denotes an lvalue reference: int& ref.
+- When used in a unary context in an expression, & is the address-of operator: std::cout << &x.
+- When used in a binary context in an expression, & is the Bitwise AND operator: std::cout << x & y
+
+For objects that require more than one byte of memory, it will return the memory address of the first byte. But the memory address alone isn't very useful. We often want the value stored in that memory address. This can be done with the *dereference operator* *. Parenetheses is not required but easier to read:
+
+```
+    #include <iostream>
+
+    int main()
+    {
+        int x{ 5 };
+        std::cout << x << '\n';     // print the value of variable x
+        std::cout << &x << '\n';    // print the memory address of variable x
+        std::count << *(&x) << '\n; // print the value at the memory address of x
+
+        return 0;
+    }
+```
+
+Like references, pointers are declared using an asterisk (*) on the data type.
+Like normal variables, pointers are not initialized by default. Not initialized pointers will contain a garbage address, thus you should always initialized your pointers to a known value.
+Once we have a pointer containing the address to another variable, we can use the dereference operator (*) to access the value at that address:
+```
+    int main()
+    {
+        int x { 5 };
+        int& ref { x };
+        int* ptr { &x }             // pointer initialized to the address of variable x
+        int* ptr1, * ptr2;          // technically correct but avoid it
+
+        std::cout << *ptr << '\n';  // retrieve value at x address, which is 5
+
+        return 0;
+    }
+```
+
+Just like the reference type has to match the referent type, the pointer type must also match the type of the object it is pointing. In addition, initializing a pointer with a literal value is not allowed (with one exception):
+
+```
+    int main()
+    {
+        int x { 5 };
+        int& ref { x };
+        double* ptr1 { &x }         // error; pointer to a double can't point to an int
+        int* ptr2 { 5 }             // error; 5 is a literal 
+        int* ptr2 { 0x0012FF7C }    // error; 0x0012FF7C is treated as a literal
+    }
+```
+
+Unlike references, we can change the assignment of the pointer to point at a different object. In addition the pointer can be used to change the value of the object it is pointing at by using the dereference operator:
+
+```
+    #include <iostream>
+
+    int main() 
+    {
+        int x { 5 };
+        int y { 6 };
+        int* ptr { &x };             // point to x's memory address
+        std::cout << *ptr << '\n';   // print 5
+
+        ptr = &y;                    // change pointer's point to y's memory address
+        std::cout << *ptr << '\n';   // print 6
+
+        *ptr = 7;                    // object at the address held by ptr (y) assigned value 6
+        std::cout << y << '\n';      // print 7
+        std::cout << *ptr << '\n';   // print 7
+
+        return 0;
+    }
+```
+
+The above reassigning the object via pointer with the dereference operator works because *ptr return a lvalue, which is the variable y here. ptr accesses the address held by the pointer and *ptr accesses the value of the memory address, which is the object being pointed at.
+
+Once we change object's value, using the dereference operator with the pointer will of course result in the new value of the object:
+```
+    #include <iostream>
+
+    int main()
+    {
+        int x{ 5 };
+        int& ref { x };  // get a reference to x
+        int* ptr { &x }; // get a pointer to x
+
+        std::cout << x;
+        std::cout << ref;  // use the reference to print x's value (5)
+        std::cout << *ptr << '\n'; // use the pointer to print x's value (5)
+
+        ref = 6; // use the reference to change the value of x
+        std::cout << x;
+        std::cout << ref;  // use the reference to print x's value (6)
+        std::cout << *ptr << '\n'; // use the pointer to print x's value (6)
+
+        *ptr = 7; // use the pointer to change the value of x
+        std::cout << x;
+        std::cout << ref;  // use the reference to print x's value (7)
+        std::cout << *ptr << '\n'; // use the pointer to print x's value (7)
+
+        return 0;
+    }
+```
+
+Pointers and references are lot alike. The primary difference is that pointers need explicit address and explicit dereference operator to get the value, while references can do this implicitey. But there are some key differences:
+
+- References must be initialized, pointers are not required to be initialized (but should be).
+- References are not objects, pointers are.
+- References can not be reseated (changed to reference something else), pointers can change what they are pointing at.
+- References must always be bound to an object, pointers can point to nothing (we’ll see an example of this in the next lesson).
+- References are “safe” (outside of dangling references), pointers are inherently dangerous (we’ll also discuss this in the next lesson).
+
+The address-of operator(&) doesn't return the address of its operand as a literal. It instead returns a pointer containing the address of the operand.
+
+```
+    #include <iostream>
+    #include <typeinfo>
+
+    int main()
+    {
+        int x{ 4 };
+        std::cout << typeid(&x).name() << '\n'; // print the type of &x, whic is int *
+
+        return 0;
+    }
+```
+
+Like a dangling reference, a dangling pointer is a pointer that is holding the address of an object that is no longer valid (e.g. because it has been destroyed). Dereferencing a dangling pointer will lead to undefined results.
+
+```
+    #include <iostream>
+
+    int main()
+    {
+        int x{ 5 };
+        int* ptr{ &x };
+
+        std::cout << *ptr << '\n'; // valid
+
+        {
+            int y{ 6 };
+            ptr = &y;
+
+            std::cout << *ptr << '\n'; // valid
+        } // y goes out of scope, and ptr is now dangling
+
+        std::cout << *ptr << '\n'; // undefined behavior from dereferencing a dangling pointer
+
+        return 0;
+    }
+```
+
+## Null Pointer
 
 # Chapter 10
 
@@ -957,6 +1332,214 @@ To avoid naming collisons:
 ```
 
 The 'color::Color' and 'color::blue' are examples of a *scope resolution operator*.
+
+## Printing enumerators
+In an enumeration, each enumerator is automatically assigned an integer value based on the list position. It is possible to explicitly define the value of enumerators. These integral values can be positive or negative, and can share the same value as other enumerators. Any non-defined enumerators are given a value one greater than the previous enumerator. 
+
+When enumerators are assigned same values, the enumerators become non-distinct -- essentially, they are interchangable. Although C++ allows it, assigning the same value to two enumerators in the same enumeration should generally be avoided.
+
+When an enumerated type is used in a function call or with an operator, the compiler will first try to find a function or operator that matches the enumerated type. For example, when the compiler tries to compile std::cout << shirt, the compiler will first look to see if operator<< knows how to print an object of type Color (because shirt is of type Color) to std::cout. If it doesn't, the compiler will then implicitly convert an unscoped enumeration or enumerator to its corresponding integer value.
+
+```
+    enum Color
+    {
+        black, // assigned 0
+        red, // assigned 1
+        blue, // assigned 2
+        green, // assigned 3
+    };
+
+    enum Animal
+    {
+        cat = 4,
+        dog, // assigned 5
+        horse = 8,
+        pig = 8,
+    };
+
+    int main()
+    {
+        Color shirt { blue };
+        std::cout << "The shirt is " << shirt;  // this will return "The shirt is 2"
+        return 0
+    }
+
+```
+
+Besides integers, you can specify a different underlying type. For example, if you are working in some bandwidth-sensitive context (e.g. sending data over a network) you may want to specify a smaller type. Specify the base type of an enumeration only when necessary:
+
+```
+    // Use an 8-bit unsigned integer as the enum base
+    enum Color : std::uint8_t
+    {
+        black,
+        red,
+        blue,
+    };
+```
+
+Most of the time, printing the enumerator's integral value (such as 2) isn’t what we want. Instead, we typically will want to print the name of whatever the enumerator represents (blue). But to do that, we need some way to convert the integral value of the enumeration (2) into a string matching the enumerator name ("blue"). At the moment there is no built-in function that does this, so we will use a *switch statement*:
+
+```
+    #include <iostream>
+    #include <string_view> // C++17
+
+    enum Color
+    {
+        black,
+        red,
+        blue,
+    };
+
+    constexpr std::string_view getColor(Color color) // C++17
+    {
+        switch (color)
+        {
+        case black: return "black";
+        case red:   return "red";
+        case blue:  return "blue";
+        default:    return "???";
+        }
+    }
+
+    int main()
+    {
+        Color shirt{ blue };
+
+        std::cout << "Your shirt is " << getColor(shirt) << '\n';
+
+        return 0;
+    }
+```
+
+The above we used a function but when we have lots of enumerations, that is a lot of functions to implement. Instead we can use *operator overloading* to teach the *operator<<* how to print the value of a program-defined enumeration:
+
+```
+    // std::ostream is the type of std::cout
+    // The return type and parameter type are references (to prevent copies from being made)!
+    std::ostream& operator<<(std::ostream& out, Color color)
+    {
+        switch (color)
+        {
+            case black: out << "black";  break;
+            case red:   out << "red";    break;
+            case blue:  out << "blue";   break;
+            default:    out << "???";    break;
+        }
+
+        return out;
+    }
+        ...
+        ...
+        ...
+        std::cout << "Your shirt is " << shirt << '\n';
+```
+When we try to print shirt using std::cout and operator<<, the compiler will see that we’ve overloaded operator<< to work with objects of type Color. This overloaded operator<< function is then called with std::cout as the out parameter, and our shirt as parameter color. Since out is a reference to std::cout, a statement such as out << "blue" is really just printing "blue" to std::cout.
+
+The compiler will implicitly convert unscoped enumerators to an integer but not vice versa. We can force the compiler to convert an integer to an unscoped enumerator using two methods:
+
+- *static_cast*:
+
+```
+    #include <iostream>
+
+    enum Pet
+    {
+        cat, // assigned 0
+        dog, // assigned 1
+        pig, // assigned 2
+        whale, // assigned 3
+    };
+
+    int main()
+    {
+        Pet pet { static_cast<Pet>(2) }; // convert integer 2 to a Pet
+        pet = static_cast<Pet>(3);       // our pig evolved into a whale!
+
+        return 0;
+    }
+```
+
+- use specified base of enumeration to initialize (but not assign) an unscoped enumeration:
+
+```
+    #include <iostream>
+
+    enum Pet: int // we've specified a base
+    {
+        cat, // assigned 0
+        dog, // assigned 1
+        pig, // assigned 2
+        whale, // assigned 3
+    };
+
+    int main()
+    {
+        Pet pet { 2 }; // ok: can initialize with integer
+        pet = 3;       // compile error: can not assign with integer
+
+        return 0;
+    }
+```
+
+## Accepting enumerator input
+Just like printing enumerator, we can also accept inputs as enums. Since enums are assigned integers by default, make the user type in an integer that corresponds to the enum. Temporarily store that integer in an int variable and static cast it to a enumeration instance. Or we can also teach the *operator>>* how to input an enum type:
+
+```
+    #include <iostream>
+
+    enum Pet
+    {
+        dog,
+        cat,
+        pig,
+        whale,
+    };
+
+    int main()
+    {
+        std::cout << "Enter a pet (0=cat, 1=dog, 2=pig, 3=whale): ";
+        int input{};
+        std::cin >> input;
+        Pet pet { static_cast<Pet>(input) };
+        return 0;
+    }
+```
+
+Teach the *operator>>* how to input an enum type:
+
+```
+#include <iostream>
+
+    enum Pet
+    {
+        dog,
+        cat,
+        pig,
+        whale,
+    };
+
+    std::istream& operator>> (std::istream& in, Pet &pet)
+    {
+        int input{};
+        in >> input;
+        pet = static_cast<Pet>(input);
+        return in;
+    }
+
+    int main()
+    {
+        std::cout << "Enter a pet (0=cat, 1=dog, 2=pig, 3=whale): ";
+        Pet pet{};
+        std::cin >> pet;
+        std::cout << pet << '\n'; // prove that it worked 
+        return 0;
+    }
+```
+
+## Scoped enumerations
+Until now they were all unscoped enumerations.
+
 
 ## Span
 A span is a collection of items that are contiguous in memory. Provides a lightweight view over a contiguous sequence of objects. A span provides a safe way to iterate over and index into objects that are arranged back-to-back in memory. Such as objects stored in a built-in array, std::array, or std::vector.
