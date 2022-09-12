@@ -31,6 +31,33 @@ After the compiler creates one or more object files, then another program called
 2. Link core and external libraries.
 3. Make sure all cross-file dependencies are resolved properly
 
+## Header files
+Compilation in C++ is done in 2 major phases.
+1. Compile the *source* text files into binary object files. The **.cpp** is the source text file and is compiled into a **.obj** object file. There may be multiple source text files but they are compiled without any knowledge of the other cpp files.
+2. The object files are linked together and the final binary file is created. 
+
+Because the files are compiled individually, the compiler has no knowledge of what names are declared in other compilation units. If those declarations are used in other cpp files as dependencies, they must be declared exactly the same in each cpp files that uses it. A slight inconsistency will cause errors, when the linker attempts to merge all the compilation units into a single program. 
+
+To minimize the potential for errors, C++ has adopted the convention of using *header* files to contain declarations. You make the declarations in a header file, then use the *#include* directive in every .cpp file or other header file that requires that declaration. The *#include* directive inserts a copy of the header file directly into the .cpp file prior to compilation. It is suffixed by **.h** or **.hxx** or **.hpp**. 
+
+Each separate source text file should have a header text file. It is good practice for a source file to include by default its own header file. There are *#include guards* in headers, which are used to check if a unique value (FRACTION_H) is defined. If it is not defined, it defines it and continues to the rest of the page. This is prevent double declaration of any user-type identifiers.
+
+```
+    #ifndef FRACTION_H
+    #define FRACTION_H
+
+    // Define a new type named Fraction
+    // This only defines what a Fraction looks like, it doesn't create one
+    // Note that this is a full definition, not a forward declaration
+    struct Fraction
+    {
+        int numerator {};
+        int denominator {};
+    };
+
+    #endif
+```
+
 ## Library
 C++ also comes with an extensive library called the C++ Standard Library (usually shortened to standard library) that provides additional functionality that you can use in your programs. One of the most commonly used parts of the C++ standard library is the **iostream** library, which contains functionality for printing text on a monitor and getting keyboard input from a user. 
 
@@ -137,3 +164,1650 @@ Example:
     * the matching asterisks to the left
     * can make this easier to read
     */
+
+
+## Objects
+Like most programming langauges, direct memory access is discouraged and instead accessed indirectly via *object*. An object can be named or unnamed (anonymous). A named object is called a *variable* while the name of the object is called an *identifier*.
+
+```
+int x; // define a variable named x, of type int
+```
+
+Objects must be declared and a declaration statement is called a *definition*. 
+
+At compile time, objects are not yet created but the compiler takes note that we are defining a certain variable with a certain name with its data type. Like Java the Object's data type must be known at compile time (static). 
+At runtime, the object is created and assigned a memory address. This is called *instantiation* and an instantiated object is also called an *instance*.
+
+## Declaration vs Definition
+A *declaration* provides basic attributes of a symbol: its type and its name. A *definition* provides all of the details of that symbol -- if it's a function, what it does; if it's a class, what fields and methods it has; if it's a variable, where the variable gets stored. Thus memory for the variable is allocated during the definition of the variable.
+
+In C language definition and declaration for a variable takes place at the same time. i.e. there is no difference between declaration and definition. 
+
+## Defining multiple variables
+It is possible to define multiple variables of the same type in a single statement by separating the names with a comma. The following code declares two variables of same integer type:
+
+```
+    int a, b;
+```
+
+You can't define variables of different types in the same statement. Variables of different types must be defined in separate statements.
+
+```
+    int a, double b; // wrong (compiler error)
+    int a; double b; // correct (but not recommended)
+
+    // correct and recommended (easier to read)
+    int a;
+    double b;
+```
+
+## Variable assignment and ininitialization
+After defining a variable you can give it a value.
+
+```
+    #include <iostream>
+
+    int main()
+    {
+        int width;
+        width = 5; // copy assignment of value 5 into variable width
+
+        // variable width now has value 5
+
+        width = 7; // change value stored in variable width to 7
+
+        // variable width now has value 7
+
+        return 0;
+    }
+```
+
+When no value is assigned to a value, it is called *default initializiation*. The variable references an undeterminate value. There are 4 basic ways to initialize variables in C++:
+- default initializiation - nothing is assigned
+- Copy initialization - assigned with =
+- Direct initialization - assigned with ()
+- Brace initialization - assigned with {}. modern way of initializing objects in C++
+
+Declaration and initialization can be done on same one line:
+
+```
+    int a; // no initializer
+    int b = 5; // initializer after equals sign
+    int c( 6 ); // initializer in parenthesis
+    int d { 7 }; // initializer in braces
+```
+
+Brace initialization doesn't allow *narrowing conversions*. This means that if you try to brace initialize a variable using a value that the variable can not safely hold, the compiler will produce an error. 
+
+```
+int width { 4.5 }; // error: a number with a fractional value can't fit into an int
+```
+
+If we tried copy and direct initialization, the compiler would simply drop the fractional part, resulting in the initialization of value 4 into variable width.'
+
+## Value initialization and Zero initalization
+When a variable is initialized with empty braces, *value initialization* takes place. In most cases, value initialization will initialize the variable to zero (or empty, if that’s more appropriate for a given type). 
+This is useful when we want to create empty variables that is ready to accept an input.
+
+*if a class is built-int, it will perform the same *value initialization*. But if the class is user-declared, it will invoke the dfault constructore.
+
+## Multiple initialization
+Like declarations, initialization of same types can be done on the same line. Keep in mind that all the variables on the line must be initialized, not just some:
+
+```
+    int a, b = 5; // wrong (a is not initialized!)
+    int a = 5, b = 6; // copy initialization
+    int c( 7 ), d( 8 ); // direct initialization
+    int e { 9 }, f { 10 }; // brace initialization (preferred)
+```
+
+## IOStream library: output
+As part of the C++ standard library that deals with IO. 
+
+To print something, use *std::cout*, along with the *insertion operator* *<<,*
+
+```
+    #include <iostream> // for std::cout
+
+    int main()
+    {
+        int x{ 5 };                         // define integer variable x, initialized with value 5
+        std::cout << x;                     // print value of x (5) to console
+        std::cout << "Hello" << " world!";  // print multiple things in one line
+        return 0;
+    }
+```
+
+Keep in mind that separate output statements don’t result in separate lines of output on the console. If we want to print separate lines of output to the console, we need to tell the console when to move the cursor to the next line using either  *std::endl* or the esacpe character '\n':
+
+```
+    #include <iostream> // for std::cout
+
+    int main()
+    {
+        int x{ 5 };
+        std::cout << "x is equal to: " << x << '\n';   // \n standalone, single quote needed
+        std::cout << "And that's all, folks!\n";   // '\n' embedded, double quote needed
+        return 0;
+    }
+```
+
+For the standalone '\n', single quotes are needed. For the embedded '\n' above, double quotes are needed.
+
+```
+    #include <iostream> // for std::cout
+
+    int main()
+    {
+        std::cout << "Hi!" << std::endl;
+        std::cout << "My name is Alex." << std::endl;
+        return 0;
+    }
+```
+
+The second std::endl above isn’t technically necessary, since the program ends immediately afterward. However, it serves a few useful purposes:
+
+- indicate that the line of output is a “complete thought” (as opposed to partial output that is completed somewhere later in the code). In this sense, it functions similarly to using a period in standard English.
+- positions the cursor on the next line, so that if we later add additional lines of output (e.g. have the program say “bye!”), those lines will appear where we expect (rather then appended to the prior line of output).
+- after running an executable from the command line, some operating systems do not output a new line before showing the command prompt again. If our program does not end with the cursor on a new line, the command prompt may appear appended to the prior line of output, rather than at the start of a new line as the user would expect.
+
+*std::endl* does two jobs: it moves the cursor to the next line, and flushes the output. When writing text to the console using std::cout, std::cout often flushes output anyway. Thus we prefer *\n* and it is easier to read.
+
+## IOStream library: input
+*std::cin* (which stands for “character input”) reads input from keyboard using the *extraction operator* (>>). The input must be stored in a variable to be used thus this is where zero initialization comes in. Just like it is possible to output more than one bit of text in a single line, it is also possible to input more than one value on a single line:
+
+```
+    #include <iostream>  // for std::cout and std::cin
+
+    int main()
+    {
+        std::cout << "Enter two number separated by a space: ";
+
+        int x{ }; // define variable x to hold user input (and zero-initialize it)
+        int y{ }; // define variable y to hold user input (and zero-initialize it)
+        std::cin >> x >> y; 
+
+        std::cout << "You entered " << x << " and " << y << '\n';
+        return 0;
+    }
+```
+
+Note that you don’t need to use ‘\n’ when accepting input, as the user will need to press the enter key to have their input accepted, and this will move the cursor to the next line.
+
+*In line with our previous recommendation that *variables should always be initialized*, best practice is to initialize the variable first.
+
+*The C++ I/O library does not provide a way to accept keyboard input without the user having to press enter. If this is something you desire, you’ll have to use a third party library.
+
+## Initialized vs Uninitialized
+C++ does not initialize most variables to a given value (zero) automatically. When a variable is given a memory address to store data, the default value is whatever garbage value that already happens to be in that memory address. A variable that hasn't been given a known value is called an uninitialied variable. 
+
+Initialized is not the opposite of uninitialized. Initialized means the object was provided with an initial value at the time of definition and uninitilaized means the object has not been given a known value. If an uninitialized object is assigned a known value, it is no longer uninitialized. 
+
+- Initialization = The object is given a known value at the point of definition.
+- Assignment = The object is given a known value beyond the point of definition.
+- Uninitialized = The object has not been given a known value yet.
+
+This lack of initialization is a performance optimization inherited from C, back when computers were slow. Imagine a case where you were going to read in 100,000 values from a file. In such case, you might create 100,000 variables, then fill them with data from the file.
+
+If C++ initialized all of those variables with default values upon creation, this would result in 100,000 initializations (slow) and for little benefit (since you’re overwriting those values anyway).
+
+For now, you should always initialize your variables because the cost of doing so is miniscule compared to the benefit. Once you are more comfortable with the language, there may be certain cases where you omit the initialization for optimization purposes. But this should always be done selectively and intentionally.
+
+```
+#include <iostream>
+
+int main()
+{
+    // define an integer variable named x
+    int x; // this variable is uninitialized because we haven't given it a value
+
+    // print the value of x to the screen
+    std::cout << x; // who knows what we'll get, because x is uninitialized
+
+    return 0;
+}
+```
+
+Most modern compilers will attempt to detect if a variable is being used without being given a value. The program may run fine anyway if the uninitialized variable happened to get assigned to a spot of memory that had a reasonable value in it, like 0. Otherwise, the compilers will be able to detect uninitialized variables, they will generally issue a compile-time error. For example, compiling the above program on Visual Studio produced the 'uninitialized local variable 'x' used' warning.
+
+A nice trick to get around this is to make the compiler think we are assigning a value to the variable.
+
+```
+#include <iostream>
+
+    void doNothing(int&) // does nothing
+    {
+    }
+
+    int main()
+    {
+        // define an integer variable named x
+        int x; // this variable is uninitialized
+
+        doNothing(x); // make the compiler think we're assigning a value to this variable
+
+        // print the value of x to the screen (who knows what we'll get, because x is uninitialized)
+        std::cout << x;
+
+        return 0;
+    }
+```
+
+always initialize your variables!
+
+## Undefined behavior
+Using the value from an uninitialized variable is our first example of *undefined behavior*. Undefined behavior (often abbreviated UB) is the result of executing code whose behavior is not well defined by the C++ language. In this case, the C++ language doesn’t have any rules determining what happens if you use the value of a variable that has not been given a known value. Consequently, if you actually do this, undefined behavior will result.
+
+Code implementing undefined behavior may exhibit any of the following symptoms:
+- different results every time it is run.
+- same incorrect result.
+- inconsistent behavior (sometimes produces the correct result, sometimes not).
+- seems like its working but produces incorrect results later in the program.
+- program crashes, either immediately or later.
+- program works on some compilers but not others.
+- program works until you change some other seemingly unrelated code.
+
+As a general rule of thumb, take care to avoid all situations that result in undefined behavior, such as using uninitialized variables.
+
+## Keywords and Special identifiers
+C++ has keywords and special identifiers: override, final, import, and module. While key words are reserved, special identifiers are not reserved. 
+
+There are three different naming conventions:
+
+- CamelCase
+- snake_case
+- pascalCase
+
+C++ uses CamelCase like Java. 
+
+Some things to keep in mind when naming:
+
+- avoid naming your identifiers starting with an underscore, as these names are typically reserved for OS, library, and/or compiler use.
+- avoid abbreviations
+- avoid trivial an overly complex names
+
+## Whitespace and Basic formatting
+The C++ compiler generally ignores whitespaces thus we say that C++ is a whitespace-independent language. The following all do the exact same thing:
+
+```
+    std::cout << "Hello world!";
+
+    std::cout               <<            "Hello world!";
+
+            std::cout << 		"Hello world!";
+
+    std::cout
+        << "Hello world!";
+```
+
+For that reason, whitespaces and newlines are often used for code organization and readability.
+
+The only exception is when whitespaces exist inside quoted text and comments. Newlines are not allowed in quoted text and comments:
+
+```
+    std::cout << "Hello
+        world!"; // Not allowed!
+
+    std::cout << "Hello "
+        "world!"; // prints "Hello world!"
+
+    std::cout << "Hello world!"; // Here is a single-line comment
+    this is not part of the comment     
+```
+
+Because newlines and whitespaces only matter in quoted texts and comments, developers often do the following when declaring a function body: 
+
+```
+int main()
+{
+    std::cout << "Hello world!\n"; // tabbed in one tab (4 spaces)
+    std::cout << "Nice to meet you.\n"; // tabbed in one tab (4 spaces)
+}
+```
+
+Some more coding style conventions: 
+
+- keep a single line no longer than 80 chars
+- if the comment is above a code, there should be a new line above the comment
+- if the comment is on the right hand side of the code, use whitespaces to align them
+- use whitespace to make your code easier to read by aligning values
+
+```
+    cost          = 57;
+    pricePerItem  = 24;
+    value         = 5;
+    numberOfItems = 17;
+    std::cout << "Hello world!\n";                  // cout lives in the iostream library
+    std::cout << "It is very nice to meet you!\n";  // these comments are easier to read
+    std::cout << "Yeah!\n";                         // especially when all lined up
+
+    // cout lives in the iostream library
+    std::cout << "Hello world!\n";
+
+    // these comments are easier to read
+    std::cout << "It is very nice to meet you!\n";
+
+    // when separated by whitespace
+    std::cout << "Yeah!\n";
+```
+
+Using the automatic formatting feature is highly recommended to keep your code’s formatting style consistent. However, don't trust it completely as it sometimes may not choose the most readable formatting. Go over the code with your eyes for double checking. 
+
+## Literals and Operators
+A *literal* or a *constant* is a fixed value that has been directly inserted into the source code. Literals can't be changed while variable value's can be changed through initialization and assignment.
+
+```
+    std::cout << "Hello world!";  // Hello world! is a literal
+    int x{ 5 };                   // 5 is a literal
+```
+
+Operators in C++ come in four different arities:
+
+- Unary operators - act on one operand. An example is the negative operator
+- Binary operators - act on two operands. The insertion (<<) and extraction (>>) operators are binary operators, taking std::cout or std::cin on the left side, and the value to output or variable to input to on the right side.
+- Ternary operators - act on three operands. There is only one of these in C++ (the conditional operator), which we’ll cover later.
+- Nullary operators - act on zero operands. There is also only one of these in C++ (the throw operator), which we’ll also cover later.
+
+## Expression
+An expression is a combination of literals, variables, operators, and function calls that *calculates a single value*. The process of executing an expression is called *evaluation*, and the single value produced is called the result of the expression.
+
+Literals evaluate to their own values. 
+Variables evaluate to the value of the variable.
+Function calls evaluate to whatever value the function returns. 
+Operators (such as operator+) let us combine multiple values together to produce a new value.
+
+Expressions do not end in a semicolon, and cannot be compiled by themselves. Rather, expressions are always evaluated as part of statements. An *expression statement* is a statement that consists of an expression followed by a semicolon. When the statement is executed, the expression will be evaluated.
+
+```
+    // type identifier { expression };
+    int x{ 2 + 3 };
+```
+
+An *expression statement* is a statement that consists of an expression followed by a semicolon. When the statement is executed, the expression will be evaluated.
+
+An expression whose result is discarded is called a *discarded-value expression*. Expression statements are by far the most common type of discarded-value expressions.
+
+# 2. Functions and Files
+
+## Functions
+A function is a reusable sequence of statements designed to do a particular job. Functions written yourself are called *user-defined functions*. When a function is called inside another FUNCTION, the CPU puts a bookmark at the current point of execution and executes the *called* function. When the called function ends, the CPU returns back to the point of book mark of the *caller* function and resumes execution.
+
+The signature of the function is also called the *function header*.The curly braces and statements in-between are called the *function body*
+
+Unlike some other languages like Python, C++ doesn't allow nested functions like the following:
+
+```
+    #include <iostream>
+
+    int main()
+    {
+        void foo() // Illegal: this function is nested inside function main()
+        {
+            std::cout << "foo!\n";
+        }
+
+        foo(); // function call to foo()
+        return 0;
+    }
+```
+
+C++ disallows calling the main function explicitly and the main function should be at the bottom of your code module.
+
+Functions should be minimal and only perform one type of action. If you see a block of code that is repeated, it is best to put that in a separate function and make calls to that function. This is follwoing the DRY best practice: *don’t repeat yourself*
+
+```
+    #include <iostream>
+    int getValueFromUser() 
+    {
+        int input{};
+        std::cout << "Enter an integer: ";
+        std::cin >> input; 
+        return input;
+    }
+
+    int main()
+    {
+        int x{ getValueFromUser() };
+        int y{ getValueFromUser() };
+        std::cout << x << " + " << y << " = " << x + y << '\n';
+        return 0;
+    }
+```
+
+## Return
+C++ has a garbage collector for memory management. When a function terminates, all the value entered inside that function is lost. To save any data from that function, we have the *return* keyword to return a value or data. You can use that value in an expression or statement (by assigning to a variable or sending it somewhere). Otherwise it will be ignored. Functions with a return type are called *value-returning function*.
+
+```
+    #include <iostream>
+
+    int getValueFromUser() // this function now returns an integer value
+    {
+        std::cout << "Enter an integer: ";
+        int input{};
+        std::cin >> input;
+
+        return input; // return the value the user entered back to the caller
+    }
+
+    int main()
+    {
+        int num { getValueFromUser() }; // initialize num with the return value of getValueFromUser()
+
+        std::cout << num << " doubled is: " << num * 2 << '\n';
+
+        return 0;
+    }
+```
+
+In the main function, a status code of 0 means the program executed successfully. 
+In C++, a function can only return a single value.
+*Early returns* are perfectly legal in C++:
+
+```
+    #include <iostream>
+
+    int print() // note: return type of int
+    {
+        std::cout << "A";
+        return 5; // the function will return to the caller here
+        std::cout << "B"; // this will never be printed
+    }
+
+    int main()
+    {
+        std::cout << print(); // print() returns value 5, which will be print to the console
+
+        return 0; // the final print is 'A5'
+    }
+```
+
+## Void functions
+Functions that don't return a value are called *non-value returning function*. Technically you can put an empty return statement at the end of a void function but of course this is redundant. You will almost never see this in real life codes and only in theoretical exams.
+
+```
+    #include <iostream>
+
+    // void means the function does not return a value to the caller
+    void printHi()
+    {
+        std::cout << "Hi" << '\n';
+
+        return; // tell compiler to return to the caller -- this is redundant since this will happen anyway!
+    } 
+
+    int main()
+    {
+        printHi();
+
+        return 0;
+    }
+```
+
+*Trying to return a value from a non-value returning function will result in a compilation error.
+
+When we call a function in a context that requires a value (e.g. std::cout), a value must be provided. In such a context, we can only call value-returning functions. The compiler will throw an error if a value is not provided.  
+
+```
+    void printHi()
+    {
+        std::cout << "Hi" << '\n';
+    }
+
+    int main()
+    {
+        std::cout << 5;             // ok: 5 is a literal value that we're sending to the console to be printed
+        std::cout << ;              // compile error: no value provided
+        std::cout << printHi();     // compile error: no value provided
+        return 0;
+    }
+```
+
+## Parameter and Argument
+A function *parameter* is a variable used in a function. They are always initialized with a value provided by the caller of the function. This value is called an *argument*.
+
+When a function is called, all of the parameters of the function are created as variables, and the value of each of the arguments is copied into the matching parameter. This process is called *pass by value*.
+
+Sometimes, you may only use a variable once to hold a return value and then pass that variable's value to another function. In that case you can directly use the return value of the function as an argument to another function:
+
+```
+    printDouble(getValueFromUser());
+```
+
+This may be more compact a bit harder to read. If you think your code is going to be read often by other developers, you should first initalize the return value to a variable and then pass it as an argument. You can also save space by directly returning the value of the expression:
+
+```
+    int add(int x, int y)
+    {
+        return x + y;
+    }
+```
+
+The following statements are all valid:
+
+```
+    std::cout << add(1, multiply(2, 3)) << '\n';    // evaluates 1 + (2 * 3)
+    std::cout << add(1, add(2, 3)) << '\n';         // evaluates 1 + (2 + 3)
+```
+
+## Local scope
+Function parameters and variables defined inside the function body are called *local variables*. As mentioned before, the local variables are garbage collected when the function ends, in the opposite order of creation.
+
+```
+    int add(int x, int y) // function parameters x and y are local variables, created and initialized here
+    {
+        int z{ x + y }; // z is a local variable too, created and initialized here
+
+        return z;
+    } // z, y, and x destroyed here
+```
+
+An object’s *lifetime* is defined to be the time between its creation and destruction. Variable creation and destruction happen during the program's runtime, not at compile time. Therefore, *lifetime is a runtime property*.
+
+*The C++ specification gives compilers a lot of flexibility to determine when local variables are created and destroyed. Objects may be created earlier, or destroyed later for optimization purposes. Most often, local variables are created when the function is entered, and destroyed in the opposite order of creation when the function is exited.
+
+An identifier’s scope determines where the identifier can be accessed within the source code. When an identifier can be accessed, we say it is *in scope*. When an identifier can not be accessed, we say it is *out of scope*. While a lifetime is a runtime property, a scope is a compile-time property.
+
+```
+    #include <iostream>
+
+    int add(int x, int y) // x and y are created and enter scope here
+    {
+        // x and y are visible/usable within this function only
+        return x + y;
+    } // y and x go out of scope and are destroyed here
+
+    int main()
+    {
+        int a{ 5 }; // a is created, initialized, and enters scope here
+        int b{ 6 }; // b is created, initialized, and enters scope here
+
+        std::cout << add(a, b) << '\n'; // calls function add() with x=5 and y=6
+
+        return 0;
+    } // b and a go out of scope and are destroyed here
+```
+*note that variables a and b are different variables from x and y.
+
+An identifier is “out of scope” anywhere it can not be accessed within the code. The term “going out of scope” is typically applied to objects rather than identifiers. We say an object “goes out of scope” at the end of the scope (the end curly brace) in which the object was instantiated. 
+
+Note that not all types of variables are destroyed when they *go out of scope*.
+
+If a function was to be called twice, the parameters x and y would be created and destroyed twice -- once for each call. 
+
+The following program, the 'add' variables x, y are distinct from 'main' variables x, y. Even though they have the same name, they have different scopes and just happen to share the same name.  
+
+```
+    #include <iostream>
+
+    int add(int x, int y) // add's x and y are created and enter scope here
+    {
+        // add's x and y are visible/usable within this function only
+        return x + y;
+    } // add's y and x go out of scope and are destroyed here
+
+    int main()
+    {
+        int x{ 5 }; // main's x is created, initialized, and enters scope here
+        int y{ 6 }; // main's y is created, initialized, and enters scope here
+
+        // main's x and y are usable within this function only
+        std::cout << add(x, y) << '\n'; // calls function add() with x=5 and y=6
+
+        return 0;
+    } // main's y and x go out of scope and are destroyed here
+```
+
+Names used for function parameters or variables declared in a function body are only visible within the function that declares them. This means local variables within a function can be named without regard for the names of variables in other functions. This helps keep functions independent. 
+
+As a general rule of thumb: local variables inside the function body should be defined as close to their first use as reasonable:
+
+
+## Naming collisions and Namespaces
+Most naming collisions occur in two cases:
+- Two (or more) definitions for a function (or global variable) are introduced into separate files that are compiled into the same program. This will result in a *linker error*
+- Two (or more) definitions for a function (or global variable) are introduced into the same file (often via an #include). This will result in a *compiler error*
+
+To prevent function identifiers from conflicting with each other, we use a namespace. A *namespace* is a region that allows you to declare names inside of it for the purpose of disambiguation. The namespace provides a scope region (called namespace scope) to the names declared inside of it. Any name declared inside the namespace won’t be mistaken for identical names in other scopes. Of course within the namespace itself, all names must be unique or a naming collision will occur.
+
+Any name that is not defined inside a class, function, or a namespace is considered to be part of the *global namespace* or *global scope*. The compiler forbids executable expression statements in the global namespace:
+
+```
+    // All of the following statements are part of the global namespace
+    void foo();    // okay: function forward declaration in the global namespace
+    int x;         // compiles but strongly discouraged: uninitialized variable definition in the global namespace
+    int y { 5 };   // compiles but discouraged: variable definition with initializer in the global namespace
+    x = 5;         // compile error: executable statements not allowed in the global namespace
+```
+
+The name *std::cout* isn't really std::cout. *cout* is the name of the function, and *std* is the name of the namespace that identifier cout is part of. Because cout is defined in the std namespace, the name cout won’t conflict with any objects or functions named cout that we create in the global namespace.
+
+When accessing an identifier in a specific namespace (e.g. std::cout), you need to tell the compiler that we’re looking for an identifier defined inside the namespace (std).  
+
+The :: symnbol is called the *scope resolution operator*. If no identifier to the left of :: is provided, it assumes the global namespace. This is safest and recommended way of using functions with specific namespaces. When an identifier includes a namespace prefix, the identifier is called a *qualified name*. 
+
+A way to access identifiers inside a namespace without a prefix is *using directive statement* but this is highly discouraged as if you have another cout function in this file, the compiler won't know which one you are referring to. 
+
+```
+    #include <iostream>
+
+    using namespace std; // this is a using directive
+
+    int main()
+    {
+        cout << "Hello world!";
+        return 0;
+    }
+```
+
+# Chapter 9
+
+## Compound Data Types
+Compound data types are data types that can be made from fundamental or other compound data types. C++ has the following compound types:
+
+- Functions
+- Arrays
+- Pointer types:
+    Pointer to object
+    Pointer to function
+- Pointer to member types:
+    Pointer to data member
+    Pointer to member function
+- Reference types:
+    L-value references
+    R-value references
+- Enumerated types:
+    Unscoped enumerations
+    Scoped enumerations
+- Class types:
+    Structs
+    Classes
+    Unions
+
+## Lvalues and Rvalues
+The compiler can determine what type the result of the expression will output. This can be done with the *auto*  keyword which automatically detects and assigns a data type to the variable with which it is used.
+
+```
+    int main()
+    {
+        auto v1 { 12 / 4 }; // int / int => int
+        auto v2 { 12.0 / 4 }; // double / int => double
+
+        return 0;
+    }
+```
+
+While the type of an expression must be known at compile time, the value of an expression may be determined at either compile time or runtime. The compiler determines which expressions can legally appear on either side of an assignment statment using the *value category* property of a statement. The *value category* of an expression indicates whether an expression resolves to a value, a function, or an object.
+
+There are two main value categories (actually 5 but these 2 are most relevant):
+
+- lvalue
+- rvalue
+
+An *Lvalue* is also known as a *locator value* that evaluates to a function or object that has an identity. It comes in two subtypes:
+
+- modifiable lvalue - the value can be modified
+- non-modifiable lvalue - the value can't be modified (because the lvalue is a const or constexpr)
+
+An *Rvalue* is an expression that is not an Lvalue. Rvalues only exist within the scope of the expression in which they are used. Common rvalues are:
+
+- literals (except Cstyle string literals)
+- return values of functions or operators
+
+```
+    #include <iostream>
+
+    int main() 
+    {
+        int x{};
+        const double d{};
+        int y { 3 }; // 3 is an rvalue expression
+
+        std::cout << x << '\n';                     // x is a modifiable lvalue expression
+        std::cout << x + 1 << '\n';                 // value only exist in this scope, thus rvalue
+        std::cout << d << '\n';                     // d is a non-modifiable lvalue expression
+        std::cout << return5() << '\n';             // value only exist in this scope, thus rvalue
+        std::cout << static_cast<int>(d) << '\n';   // result of static casting d to an int is an rvalue
+        
+        5 = x; // error: 5 is an rvalue expression and x is a modifiable lvalue expression
+
+        return 0;
+    }
+```
+
+'x = 5' is valid but '5 = x' is not. This is because an assignment operation requires the left operand of the assignment to be a modifiable lvalue expression and right operatnd to be an rvalue expression. 
+
+Lvalues can be implicitely converted to rvalues, which is why the following works:
+
+```
+    int main() 
+    {
+        int x { 1 };
+        int y { 2 };
+        x = y;
+
+        return 0;
+    }
+```
+
+lvalues expressions are those that evaluate to variables or other identifiable objects that *persist beyond the end of the expression*.
+rvalues expressions are those that evaluate to literals or the returned value of functions and operators that are *discarded at the end of the expression*.
+
+## References
+As you already know, reference is an alias for an existing object. There are two types of references:
+
+- lvalue references
+- rvalue references
+
+## Lvalue references
+Lvalue references are used to alias already existing lvalues (like variables) and use an ampersand. It doesn't matter whether the ampersand is attached to the type name (int) or the variable's name. Most C++ programmers nowadays prefer attaching the ampersand to the type name. 
+
+The variables used to reference another existing object are called *reference variables* and they have the same scoping and duration rules as normal variables do. But references themselves are not objects (in C++) as they don't require to exist or occupy memory; if possible the compiler will replace all occurence of the reference will the actual object it is referencing (called *referent*). Note that this is NOT ALWAYS possible and references may require storage after all.
+
+Like constants, all references must be initialized. When a reference is initialized with an object (or function), we say it is bound to that object (or function). The process by which such a reference is bound is called *reference binding*. Since we are talking about references, changing the value of the object being referenced will also reflect on the reference variable (and vice versa). Below, 'ref' and 'x' can be used synonymously:
+
+```
+    #include <iostream>
+
+    int main()
+    {
+        int& invalidRef; //error, needs to be initialized
+
+        int x { 5 };    // x is a normal integer variable
+        int& ref { x }; // ref is an lvalue reference variable, now be used as an alias for variable x
+
+        std::cout << x << '\n';  // print the value of x (5)
+        std::cout << ref << '\n'; // print the value of x via ref (5)
+
+        x = 6;
+        std::cout << x << '\n';  // print the value of x (6)
+        std::cout << ref << '\n'; // print the value of x via ref (6)
+
+        ref = 7;
+        std::cout << x << '\n';  // print the value of x (7)
+        std::cout << ref << '\n'; // print the value of x via ref (7)
+
+        return 0;
+    }
+```
+
+Keep in mind that Lvalue references can't reference all types of Lvalues; unmodifiable Lvalues can't be binded as you’d be able to change those values through the reference, which would violate their unmodifable property. In addition, the type of the reference must match the type of the lvalue being referenced:
+
+```
+int main()
+{
+    const int x { 5 };
+    double y { 3.23 };
+    int& invalidRef { x };  // error: can't bind to non-modifiable lvalue
+    int& invalidRef2 { 0 }; // error: can't bind to an rvalue
+    int& invalidRef3 { y }; // error: reference to int can't bind to an lvalue of type double
+}
+```
+
+Once a reference is initilaized, it can NOT be changed to reference some other lvalue. This will not throw an error but not work as the programmer intended. Instead of changing the reference to another lvalue, it will instead reassign the original refereneced lvalue to the  value of the new referenced lvalue:
+
+```
+    #include <iostream>
+
+    int main()
+    {
+        int x { 5 };
+        int y { 6 };
+
+        int& ref { x }; // ref is now an alias for x
+
+        ref = y; // assigns 6 (the value of y) to x (the object being referenced by ref)
+
+        std::cout << x << '\n'; // user is expecting this to print 5 but instead print 6
+
+        return 0;
+    }
+```
+
+The lifetime of a reference is independent from the lifetime of the referent (object it is referencing). This means that the reference can be destroyed before the referent, and vice versa. If the reference is destroyed first, this won't impact the referent. If the referent is destroyed first, the reference is left dangling and it is called a *dangling reference*. This will lead to undefined behavior.
+
+As mentioned before, references aren't objects thus a reference can't reference another reference (lvalue reference is required to reference an identifiable object). It won't throw an error but not behave as you intended:
+
+```
+    int var{};
+    int& ref1{ var };  // an lvalue reference bound to var
+    int& ref2{ ref1 }; // an lvalue reference bound to var
+```
+
+It is however possible to make a reference an object or a reference that can be reseated via a *std::reference_wrapper* but that's for later
+
+## Pointers
+A *pointer* is an object that holds a memory address as its value. This is typically the memory address of another variable. 
+
+Quick summary about memory address and accessing them:
+
+For variables, we don't have to worry about what specific memory addresses are assigned or how many bytes are required to store the object's value. The compiler translates this name into the appropriately assigned memory address. The same goes for references since they are an alias to the object and the mentioning the reference will point to the same memory address as the object.
+
+The memory address isn't exposed to us explicitely but this information can be accessed with the *address-of operator* &.
+
+*The ampersand symbol has different meanings depending on the context:
+- When following a type name, & denotes an lvalue reference: int& ref.
+- When used in a unary context in an expression, & is the address-of operator: std::cout << &x.
+- When used in a binary context in an expression, & is the Bitwise AND operator: std::cout << x & y
+
+For objects that require more than one byte of memory, it will return the memory address of the first byte. But the memory address alone isn't very useful. We often want the value stored in that memory address. This can be done with the *dereference operator* *. Parenetheses is not required but easier to read:
+
+```
+    #include <iostream>
+
+    int main()
+    {
+        int x{ 5 };
+        std::cout << x << '\n';     // print the value of variable x
+        std::cout << &x << '\n';    // print the memory address of variable x
+        std::count << *(&x) << '\n; // print the value at the memory address of x
+
+        return 0;
+    }
+```
+
+Like references, pointers are declared using an asterisk (*) on the data type.
+Like normal variables, pointers are not initialized by default. Not initialized pointers will contain a garbage address, thus you should always initialized your pointers to a known value.
+Once we have a pointer containing the address to another variable, we can use the dereference operator (*) to access the value at that address:
+```
+    int main()
+    {
+        int x { 5 };
+        int& ref { x };
+        int* ptr { &x }             // pointer initialized to the address of variable x
+        int* ptr1, * ptr2;          // technically correct but avoid it
+
+        std::cout << *ptr << '\n';  // retrieve value at x address, which is 5
+
+        return 0;
+    }
+```
+
+Just like the reference type has to match the referent type, the pointer type must also match the type of the object it is pointing. In addition, initializing a pointer with a literal value is not allowed (with one exception):
+
+```
+    int main()
+    {
+        int x { 5 };
+        int& ref { x };
+        double* ptr1 { &x }         // error; pointer to a double can't point to an int
+        int* ptr2 { 5 }             // error; 5 is a literal 
+        int* ptr2 { 0x0012FF7C }    // error; 0x0012FF7C is treated as a literal
+    }
+```
+
+Unlike references, we can change the assignment of the pointer to point at a different object. In addition the pointer can be used to change the value of the object it is pointing at by using the dereference operator:
+
+```
+    #include <iostream>
+
+    int main() 
+    {
+        int x { 5 };
+        int y { 6 };
+        int* ptr { &x };             // point to x's memory address
+        std::cout << *ptr << '\n';   // print 5
+
+        ptr = &y;                    // change pointer's point to y's memory address
+        std::cout << *ptr << '\n';   // print 6
+
+        *ptr = 7;                    // object at the address held by ptr (y) assigned value 6
+        std::cout << y << '\n';      // print 7
+        std::cout << *ptr << '\n';   // print 7
+
+        return 0;
+    }
+```
+
+The above reassigning the object via pointer with the dereference operator works because *ptr return a lvalue, which is the variable y here. ptr accesses the address held by the pointer and *ptr accesses the value of the memory address, which is the object being pointed at.
+
+Once we change object's value, using the dereference operator with the pointer will of course result in the new value of the object:
+```
+    #include <iostream>
+
+    int main()
+    {
+        int x{ 5 };
+        int& ref { x };  // get a reference to x
+        int* ptr { &x }; // get a pointer to x
+
+        std::cout << x;
+        std::cout << ref;  // use the reference to print x's value (5)
+        std::cout << *ptr << '\n'; // use the pointer to print x's value (5)
+
+        ref = 6; // use the reference to change the value of x
+        std::cout << x;
+        std::cout << ref;  // use the reference to print x's value (6)
+        std::cout << *ptr << '\n'; // use the pointer to print x's value (6)
+
+        *ptr = 7; // use the pointer to change the value of x
+        std::cout << x;
+        std::cout << ref;  // use the reference to print x's value (7)
+        std::cout << *ptr << '\n'; // use the pointer to print x's value (7)
+
+        return 0;
+    }
+```
+
+Pointers and references are lot alike. The primary difference is that pointers need explicit address and explicit dereference operator to get the value, while references can do this implicitey. But there are some key differences:
+
+- References must be initialized, pointers are not required to be initialized (but should be).
+- References are not objects, pointers are.
+- References can not be reseated (changed to reference something else), pointers can change what they are pointing at.
+- References must always be bound to an object, pointers can point to nothing (we’ll see an example of this in the next lesson).
+- References are “safe” (outside of dangling references), pointers are inherently dangerous (we’ll also discuss this in the next lesson).
+
+The address-of operator(&) doesn't return the address of its operand as a literal. It instead returns a pointer containing the address of the operand.
+
+```
+    #include <iostream>
+    #include <typeinfo>
+
+    int main()
+    {
+        int x{ 4 };
+        std::cout << typeid(&x).name() << '\n'; // print the type of &x, whic is int *
+
+        return 0;
+    }
+```
+
+Like a dangling reference, a dangling pointer is a pointer that is holding the address of an object that is no longer valid (e.g. because it has been destroyed). Dereferencing a dangling pointer will lead to undefined results.
+
+```
+    #include <iostream>
+
+    int main()
+    {
+        int x{ 5 };
+        int* ptr{ &x };
+
+        std::cout << *ptr << '\n'; // valid
+
+        {
+            int y{ 6 };
+            ptr = &y;
+
+            std::cout << *ptr << '\n'; // valid
+        } // y goes out of scope, and ptr is now dangling
+
+        std::cout << *ptr << '\n'; // undefined behavior from dereferencing a dangling pointer
+
+        return 0;
+    }
+```
+
+## Null Pointer
+
+# Chapter 10
+
+## User-defined types and Program-defined types
+Consider the case of a type alias, which allows us to define a new name for an existing type. Because a type alias introduces a new identifier into the program, a type alias must be defined before it can be used:
+
+```
+    #include <iostream>
+
+    using length = int; // define a type alias with identifier 'length'
+
+    int main()
+    {
+        length x { 5 }; // we can use 'length' here since we defined it above
+        std::cout << x;
+
+        return 0;
+    }
+```
+
+The definition doesn't create an object but merely tells the compiler what a *length* is. This is also true for *user-defined types* and its definition is called *type definition*. Below we first define what a *Fraction* is and then instantiate it in the *main* class.
+
+```
+    // Define a program-defined type named Fraction so the compiler understands what a Fraction is
+    // This only defines what a Fraction type looks like, it doesn't create one
+    struct Fraction
+    {
+        int numerator {};
+        int denominator {};
+    };
+
+    // Now we can make use of our Fraction type
+    int main()
+    {
+        Fraction f{ 3, 4 }; // this actually instantiates a Fraction object named f
+
+        return 0;
+    }
+```
+
+Don’t forget to end your type definitions with a semicolon, otherwise the compiler will typically error on the next line of code. For example, if you remove the semicolon from the end of the Fraction definition (line 8) of the example above, the compiler will probably complain about the definition of main() (line 11).
+
+A user-defined type is any type that is not part of the core C++ language, meaning the C++ standard library are technically also considered user-defined type. A program-defined type is a only a type that you've defined.
+
+Every code file that uses a program-defined type needs to see the full type definition before it is used. This is required so that the compiler knows how much memory to allocate for objects of that type.
+
+As mentioned before, program-defined types are typically defined in header files, and then *#included* into any code file that requires that type definition. These header files are typically given the same name as the program-defined type
+
+```
+    #ifndef FRACTION_H
+    #define FRACTION_H
+
+    // Define a new type named Fraction
+    // This only defines what a Fraction looks like, it doesn't create one
+    // Note that this is a full definition, not a forward declaration
+    struct Fraction
+    {
+        int numerator {};
+        int denominator {};
+    };
+
+    #endif
+```
+
+User-defined types are exempt from the *one-definition* rule and can be propagated to multiple files.
+
+## Enumerations
+Enumeration or Enum is a compound data type where every possible value is defined as a symbolic constant, called enumerator. Enums are program-defined types thus need to be defined before we can use it. There are two types of enums:
+
+- Unscoped enums
+- Scoped enums
+
+Enumerated types are best used when you have a smallish set of related constants, and objects only need to hold one of those values at a time.
+
+```
+    // Define a new unscoped enumeration named Color
+    enum Color
+    {
+        // Each enumerator is separated by a comma, not a semicolon
+        red,
+        green,
+        blue, // trailing comma optional but recommended
+    }; // the enum definition must end with a semicolon
+
+    int main()
+    {
+        // Define a few variables of enumerated type Color
+        Color apple { red };   // my apple is red
+        Color shirt { green }; // my shirt is green
+        Color cup { blue };    // my cup is blue
+
+        Color socks { white }; // error: white is not an enumerator of Color
+        Color hat { 2 };       // error: 2 is not an enumerator of Color
+
+        return 0;
+    }
+```
+
+Enumerations don’t have to be named, but unnamed enumerations should be avoided in modern C++. The enumerators should be named all lower case.
+
+Each enumerated type you create is considered to be a distinct type, meaning the compiler can distinguish it from other types (unlike typedefs or type aliases, which are considered non-distinct from the types they are aliasing). Therefore, enumerators defined as part of one enumerated type can’t be used with objects of another enumerated type:
+
+```
+    int main()
+    {
+        Pet myPet { black }; // compile error: black is not an enumerator of Pet
+        Color shirt { pig }; // compile error: pig is not an enumerator of Color
+
+        return 0;
+    }
+```
+
+Enums have a variety of good uses, such as error codes or game items:
+
+```
+    enum FileReadResult
+    {
+        readResultSuccess,
+        readResultErrorFileOpen,
+        readResultErrorFileRead,
+        readResultErrorFileParse,
+    };
+
+    enum ItemType
+    {
+        sword,
+        torch,
+        arrow,
+    };
+
+    enum SortOrder
+    {
+        alphabetical,
+        alphabeticalReverse,
+        numerical,
+    }
+```
+
+While many languages use enums to define Booleans, C++ define Booleans as keywords instead of enums.
+
+If th ere are two enumerators of the same name in the same scope, this leads to a naming collision and a compile error. 
+
+```
+    enum Color
+    {
+        red,
+        green,
+        blue, // blue is put into the global namespace
+    };
+
+    enum Feeling
+    {
+        happy,
+        tired,
+        blue, // error: naming collision with the above blue
+    };
+```
+
+To avoid naming collisons:
+
+- prefix each enumator with the name of the enumeration
+- put the enumeration inside of a *namespace* for separate scope region (preferrred)
+
+```
+    namespace color
+    {
+        // The names Color, red, blue, and green are defined inside namespace color
+        enum Color
+        {
+            red,
+            green,
+            blue,
+        };
+    }
+
+    namespace feeling
+    {
+        enum Feeling
+        {
+            happy,
+            tired,
+            blue, // feeling::blue doesn't collide with color::blue
+        };
+    }
+
+    int main()
+    {
+        color::Color paint { color::blue };
+        feeling::Feeling me { feeling::blue };
+
+        return 0;
+    }
+```
+
+The 'color::Color' and 'color::blue' are examples of a *scope resolution operator*.
+
+## Printing enumerators
+In an enumeration, each enumerator is automatically assigned an integer value based on the list position. It is possible to explicitly define the value of enumerators. These integral values can be positive or negative, and can share the same value as other enumerators. Any non-defined enumerators are given a value one greater than the previous enumerator. 
+
+When enumerators are assigned same values, the enumerators become non-distinct -- essentially, they are interchangable. Although C++ allows it, assigning the same value to two enumerators in the same enumeration should generally be avoided.
+
+When an enumerated type is used in a function call or with an operator, the compiler will first try to find a function or operator that matches the enumerated type. For example, when the compiler tries to compile std::cout << shirt, the compiler will first look to see if operator<< knows how to print an object of type Color (because shirt is of type Color) to std::cout. If it doesn't, the compiler will then implicitly convert an unscoped enumeration or enumerator to its corresponding integer value.
+
+```
+    enum Color
+    {
+        black, // assigned 0
+        red, // assigned 1
+        blue, // assigned 2
+        green, // assigned 3
+    };
+
+    enum Animal
+    {
+        cat = 4,
+        dog, // assigned 5
+        horse = 8,
+        pig = 8,
+    };
+
+    int main()
+    {
+        Color shirt { blue };
+        std::cout << "The shirt is " << shirt;  // this will return "The shirt is 2"
+        return 0
+    }
+
+```
+
+Besides integers, you can specify a different underlying type. For example, if you are working in some bandwidth-sensitive context (e.g. sending data over a network) you may want to specify a smaller type. Specify the base type of an enumeration only when necessary:
+
+```
+    // Use an 8-bit unsigned integer as the enum base
+    enum Color : std::uint8_t
+    {
+        black,
+        red,
+        blue,
+    };
+```
+
+Most of the time, printing the enumerator's integral value (such as 2) isn’t what we want. Instead, we typically will want to print the name of whatever the enumerator represents (blue). But to do that, we need some way to convert the integral value of the enumeration (2) into a string matching the enumerator name ("blue"). At the moment there is no built-in function that does this, so we will use a *switch statement*:
+
+```
+    #include <iostream>
+    #include <string_view> // C++17
+
+    enum Color
+    {
+        black,
+        red,
+        blue,
+    };
+
+    constexpr std::string_view getColor(Color color) // C++17
+    {
+        switch (color)
+        {
+        case black: return "black";
+        case red:   return "red";
+        case blue:  return "blue";
+        default:    return "???";
+        }
+    }
+
+    int main()
+    {
+        Color shirt{ blue };
+
+        std::cout << "Your shirt is " << getColor(shirt) << '\n';
+
+        return 0;
+    }
+```
+
+The above we used a function but when we have lots of enumerations, that is a lot of functions to implement. Instead we can use *operator overloading* to teach the *operator<<* how to print the value of a program-defined enumeration:
+
+```
+    // std::ostream is the type of std::cout
+    // The return type and parameter type are references (to prevent copies from being made)!
+    std::ostream& operator<<(std::ostream& out, Color color)
+    {
+        switch (color)
+        {
+            case black: out << "black";  break;
+            case red:   out << "red";    break;
+            case blue:  out << "blue";   break;
+            default:    out << "???";    break;
+        }
+
+        return out;
+    }
+        ...
+        ...
+        ...
+        std::cout << "Your shirt is " << shirt << '\n';
+```
+When we try to print shirt using std::cout and operator<<, the compiler will see that we’ve overloaded operator<< to work with objects of type Color. This overloaded operator<< function is then called with std::cout as the out parameter, and our shirt as parameter color. Since out is a reference to std::cout, a statement such as out << "blue" is really just printing "blue" to std::cout.
+
+The compiler will implicitly convert unscoped enumerators to an integer but not vice versa. We can force the compiler to convert an integer to an unscoped enumerator using two methods:
+
+- *static_cast*:
+
+```
+    #include <iostream>
+
+    enum Pet
+    {
+        cat, // assigned 0
+        dog, // assigned 1
+        pig, // assigned 2
+        whale, // assigned 3
+    };
+
+    int main()
+    {
+        Pet pet { static_cast<Pet>(2) }; // convert integer 2 to a Pet
+        pet = static_cast<Pet>(3);       // our pig evolved into a whale!
+
+        return 0;
+    }
+```
+
+- use specified base of enumeration to initialize (but not assign) an unscoped enumeration:
+
+```
+    #include <iostream>
+
+    enum Pet: int // we've specified a base
+    {
+        cat, // assigned 0
+        dog, // assigned 1
+        pig, // assigned 2
+        whale, // assigned 3
+    };
+
+    int main()
+    {
+        Pet pet { 2 }; // ok: can initialize with integer
+        pet = 3;       // compile error: can not assign with integer
+
+        return 0;
+    }
+```
+
+## Accepting enumerator input
+Just like printing enumerator, we can also accept inputs as enums. Since enums are assigned integers by default, make the user type in an integer that corresponds to the enum. Temporarily store that integer in an int variable and static cast it to a enumeration instance. Or we can also teach the *operator>>* how to input an enum type:
+
+```
+    #include <iostream>
+
+    enum Pet
+    {
+        dog,
+        cat,
+        pig,
+        whale,
+    };
+
+    int main()
+    {
+        std::cout << "Enter a pet (0=cat, 1=dog, 2=pig, 3=whale): ";
+        int input{};
+        std::cin >> input;
+        Pet pet { static_cast<Pet>(input) };
+        return 0;
+    }
+```
+
+Teach the *operator>>* how to input an enum type:
+
+```
+    #include <iostream>
+
+    enum Pet
+    {
+        dog,
+        cat,
+        pig,
+        whale,
+    };
+
+    std::istream& operator>> (std::istream& in, Pet &pet)
+    {
+        int input{};
+        in >> input;
+        pet = static_cast<Pet>(input);
+        return in;
+    }
+
+    int main()
+    {
+        std::cout << "Enter a pet (0=cat, 1=dog, 2=pig, 3=whale): ";
+        Pet pet{};
+        std::cin >> pet;
+        std::cout << pet << '\n'; // prove that it worked 
+        return 0;
+    }
+```
+
+## Scoped enumerations
+Until now they were all unscoped enumerations.
+
+
+## Span
+A span is a collection of items that are contiguous in memory. Provides a lightweight view over a contiguous sequence of objects. A span provides a safe way to iterate over and index into objects that are arranged back-to-back in memory. Such as objects stored in a built-in array, std::array, or std::vector.
+
+If you typically access a sequence of back-to-back objects using a pointer and an index, a span is a safer, lightweight alternative.
+
+The size of a span can be set at compile time by specifying it as a template argument, or at runtime by specifying dynamic_extent.
+
+Unlike array or vector, a span doesn't "own" the elements inside it. A span doesn't free any storage for the items inside it because it doesn't own the storage for those objects.
+
+# Chapter 11
+
+## std::array
+Both *fixed arrays* and *dynamic arrays* are built right into C++ and come with downsides: Fixed arrays decay into pointers losing the array length information when they do, and dynamic arrays have messy deallocation issues and are challenging to resize without error. To use array with ease, the C++ standard library includes std::array and std::vector. 
+
+std::array provides fixed array functionality that won’t decay when passed into a function. std::array is defined in the <array> header, inside the std namespace. Just like the native fixed arrays, the length of the std::array must be known at compile time. The std::array can be initialized using the *initializer list* or *list initialization*. Since C++17, you can omit the type and size together but not one or the other, and only if the array is explicitly initialized. You can also assign values to the array using an initializer list:
+
+```
+    #include <array>
+
+    std::array<int, 3> myArray;                         // declare an integer array with length 3
+    std::array<int, 5> myArray1 = { 9, 7, 5, 3, 1 };    // initializer list
+    std::array<int, 5> myArray2 { 9, 7, 5, 3, 1 };      // list initialization
+    std::array<int, > myArray3 { 9, 7, 5, 3, 1 };       // illegal, array length must be provided
+    std::array<int> myArray4 { 9, 7, 5, 3, 1 };         // illegal, array length must be provided
+    std::array myArray5 { 9, 7, 5, 3, 1 };              // The type is deduced to std::array<int, 5>
+    std::array myArray6 { 9.7, 7.31 };                  // The type is deduced to std::array<double, 2>
+    std::array<int, 5> myArray7;                        // declare an array
+    myArray7 = { 9, 7, 5, 3, 1 }                        // assign using initializer list
+```
+
+If the compiler is before C++17, then explicit syntax of type and size is required. Since C++20, it is possible to specify the element type but omit the array length. This makes creation of std::array a little more like creation of C-style arrays. To create an array with a specific type and deduced size, we use the std::to_array function. The downside is it's expensive because it actually copies all elements from the C-style array to a std::array. Therefore, avoid it when array is created many times (like in a loop)
+
+```
+    auto myArray1 { std::to_array<int, 5>({ 9, 7, 5, 3, 1 }) }; // Specify type and size
+    auto myArray2 { std::to_array<int>({ 9, 7, 5, 3, 1 }) };    // Specify type only, deduce size
+    auto myArray3 { std::to_array({ 9, 7, 5, 3, 1 }) };         // Deduce type and size
+```
+
+Like built-in fixed arrays, the *subscript operator[]* doesn't do any bounds-checking. The at() function, however, does. It may be slower than the subscript operator but definitely safer:
+
+```
+    #include <array>
+
+    std::array myArray { 9, 7, 5, 3, 1 };   // initialized using list initialization
+    myArray.at(1) = 6;                      // array element 1 is valid, sets array element 1 to value 6
+    myArray.at(9) = 10;                     // array element 9 is invalid, will throw a runtime error
+```
+
+std::array will clean up after itself when it goes out of scope, so there’s no need to do any kind of manual cleanup.
+
+The size() function is used to retrieve the length of the std::array. Because std::array doesn’t decay to a pointer when passed to a function, the size() function will work even if you call it from within a function:
+
+```
+    #include <array>
+    #include <iostream>
+
+    void printLength(const std::array<double, 5>& myArray)
+    {
+        std::cout << "length: " << myArray.size() << '\n';
+    }
+
+    int main()
+    {
+        std::array myArray { 9.0, 7.2, 5.4, 3.6, 1.8 };
+
+        printLength(myArray);
+
+        return 0;
+    }
+```
+
+Note that we passed std::array by (const) reference. This is to prevent the compiler from making a copy of the std::array when the std::array was passed to the function (for performance reasons). Therefore it is good practice to *pass std::array by reference or const reference*
+
+Because length is always known, range-based for-loops work with std::array. You can even sort it using std::sort, which is inside the <algorithm> header.
+
+```
+    #include <algorithm>
+    #include <array>
+    #include <iostream>
+
+    void printArray(const std::array<int, 5>& myArray)
+    {
+        for (int element : myArray)
+            std::cout << element << ' ';
+        std::cout << '\n';  
+    }
+
+    int main()
+    {
+        std::array myArray { 7, 3, 1, 9, 5 };
+
+        std::sort(myArray.begin(), myArray.end());      // sort the array forwards
+        printArray(myArray);                            // prints 1 3 5 7 9
+
+        std::sort(myArray.rbegin(), myArray.rend());    // sort the array backwards
+        printArray(myArray);                            // prints 9 7 5 3 1
+
+        return 0;
+    }
+```
+
+Handling of std::array is specific to its type and length (as shown above in the printArray function). If we want a function that can handle arrays of different types or lengths, that requires lots of deep copying. We can create a template function that parmeterizes part or all of the type information and C++ will use that template to create "real" functions with actual types as needed:
+
+```
+    #include <algorithm>
+    #include <array>
+    #include <iostream>
+
+    template <typename T, std::size_t size>             // parameterize the element typename as T, size_t as size
+    void printArray(const std::array<T, size>& myArray) // function will be created with various types when called
+    {
+        for (int element : myArray)
+            std::cout << element << ' ';
+        std::cout << '\n';  
+    }
+
+    int main()
+    {
+        std::array myArray5{ 9.0, 7.2, 5.4, 3.6, 1.8 };
+        printArray(myArray5);
+
+        std::array myArray7{ 9.0, 7.2, 5.4, 3.6, 1.8, 1.2, 0.7 };
+        printArray(myArray7);
+
+        return 0;
+    }
+
+```
+
+Remember that in C++, 'size_type' is an unsigned integral type. But the regular 'int' type we see is a signed integral type. Therefore, a typical for-loop condition 'int i{ 0 }; i < myArray.size();' and the array index 'myArray[i]'  will have a mismatch. Interestingly enough, 'size_type' isn’t a global type (like int or std::size_t). Rather, it’s defined inside the definition of std::array. But to generally avoid all this complication, it's recommended to avoid manual indexing of std::array in the first place. Instead, use range-based for-loops (or iterators) if possible.
+
+```
+    #include <iostream>
+    #include <array>
+
+    int main()
+    {
+        std::array myArray { 7, 3, 1, 9, 5 };
+
+        // throws an error due to type mismatch
+        for (int i{ 0 }; i < myArray.size(); ++i)  
+            std::cout << myArray[i] << ' ';
+
+        // std::array<int, 5>::size_type is the return type of size()!
+        for (std::array<int, 5>::size_type i{ 0 }; i < myArray.size(); ++i) 
+            std::cout << myArray[i] << ' ';
+
+        // more readable form
+        for (std::size_t i{ 0 }; i < myArray.size(); ++i)
+            std::cout << myArray[i] << ' ';
+
+        std::cout << '\n';
+
+        return 0;
+    }
+```
+
+*read more about for-loops in C++ and arrays*
+
+std::array can also be used with program-defined types like a struct. But things get a little weird when we try to initialize an array whose element type requires a list of values. The following doesn't work because a std::array is defined as a struct that contains a C-style array member: 
+
+```
+    struct House
+    {
+        int number{};
+        int stories{};
+        int roomsPerStory{};
+    };
+
+    int main() 
+    {
+        // Doesn't work.
+        std::array<House, 3> houses {   // initializer for houses
+            { 13, 4, 30 },              // initializer for the C-style array member inside the std::array struct
+            { 14, 3, 10 },              // ?
+            { 15, 3, 40 }               // ?
+        };
+    }
+```
+
+So when we try to initialize an array whose element type requires a list of values, we need an extra set of braces to initialize the C-style array member inside the std::array struct:
+
+```
+    struct House
+    {
+        int number{};
+        int stories{};
+        int roomsPerStory{};
+    };
+
+    int main() 
+    {
+        // This works as expected
+        std::array<House, 3> houses {                               // initializer for houses
+            {                                                       // initialize the C-style array member inside the std::array struct
+                { 13, 4, 30 },                                      // initializer for array element 0
+                { 14, 3, 10 },                                      // initializer for array element 1
+                { 15, 3, 40 },                                      // initializer for array element 2
+            }
+        };
+    }
+```
+std::array is a great improvement over the built-in fixed arrays but requires slightly more awkward syntax, that you have to explicitly specify the array length (the compiler won’t calculate it for you from the initializer, unless you also omit the type, which isn’t always possible), and the signed/unsigned issues with size and indexing. An even better data structure is std::vector.
+
+## std::vector
+This data structure provides dynamic array functionality that handles its own memory managment. This lets you set the length of the array at runtime without explicitly allocating memory for it. In addition, no need to declare the array data type since C++17. Just like std::array, accessing array elements can be done via [] or the .at() function. The latter checks for bounds while the former doesn't. In either case if you request an element that is off the end of the array, the vector will not automatically resize.
+
+```
+    #include <vector>
+    // no need to specify length at the declaration
+    std::vector<int> array;
+    std::vector<int> array2 = { 9, 7, 5, 3, 1 }; // use initializer list to initialize array (before C++11)
+    std::vector<int> array3 { 9, 7, 5, 3, 1 }; // use uniform initialization to initialize array
+
+    // as with std::array, the type can be omitted since C++17
+    std::vector array4 { 9, 7, 5, 3, 1 }; // deduced to std::vector<int>
+
+    array[6] = 2; // no bounds checking
+    array.at(7) = 3; // does bounds checking
+```
+
+A vector is much safter to use than doing your own memory allocation. When a vector variable goes out of scope, it automatically deallocates the memory it controls (if necessary). This is not only handy (as you don’t have to do it yourself), it also helps prevent memory leaks. Consider the following snippet:
+
+```
+    void doSomething(bool earlyExit)
+    {
+        int* array{ new int[5] { 9, 7, 5, 3, 1 } }; // allocated memory using new
+
+        if (earlyExit)
+            return; // exits the function without deallocating the memory allocated above
+
+        // do stuff here
+
+        delete[] array; // never called
+    }
+```
+
+If earlyExit is set to true, array will never be deallocated, and the memory will be leaked. This will won't happen if array is instead a std::vector.
+
+There are a lot more useful features with std::vector that built-in dynamic arrays don't have. std::vector keeps track of its length and this can be accessed via the size() function. It will return a value of nested type *size_type*, which is an unsigned intteger. Resizing a std::vector is also simple and can be done by calling the resize() function. The existing elements will be preserved. If you increase it, new elements will be initialized to the default value type of the array (for ints this is 0). If you decrease it, it will remove the elements until the resized length.
+
+```
+    #include <vector>
+    #include <iostream>
+
+    int main()
+    {
+        std::vector array1 { 0, 1, 2, 3, 4 };
+        std::vector array2 { 0, 1, 2 };
+        array1.resize(3);                       // set size to 3
+        array2.resize(5)                        // set size to 5
+
+        std::cout << array1.size();             // prints 3
+        std::cout << array2.size();             // prints 5
+        for (int i : array1)
+            std::cout << i << ' ';
+        std::cout << '\n';                      // prints 0 1 2
+        for (int i : array2)
+            std::cout << i << ' ';
+        std::cout << '\n';                      // prints 0 1 2 0 0
+
+        return 0;
+    }
+```
+
+Keep in mind  that resizing is computationally expensive and thus should be minimized. A rule of thumb is, if the type is some kind of list and you don’t want to initialize it with a list, use direct initialization.
+
+There is a special implementation for std::vector of  type bool. It can compact 8 booleans into a byte.
+
+# Chapter 12
