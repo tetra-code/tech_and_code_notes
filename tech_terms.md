@@ -75,10 +75,11 @@ For byte code compilation, the compiler converts (compiles) the code into byte c
 
 For native instruction compilation, the compiler converts (compiles) the code into CPU specific instruction sets and the CPU executes them. This method requires recompilation for each different CPU architecture and OS. Example includes C++.
 
-## Higher-order function
-A function where another function is passed as a parameter or returns another function. Sca 
-
 ## CMake
 CMake is an open-source, cross-platform software development tool that uses compiler-independent and platform-independent configuration files to generate native build tool files specific to your compiler and platform. It is used for build automation, testing, packaging and installing the software. It is not a build system itself but generates another system's build files. It is used in conjunction with native build environments such as Visual Studio, Make, Qt Creator, Ninja, Android Studio, Apple's Xcode, etc.
 
 In an IDE, the **CMakeLists.txt** tells the CMake build system how to compile/link the program.
+
+## Kernel
+
+## How Jupyter Notebook works

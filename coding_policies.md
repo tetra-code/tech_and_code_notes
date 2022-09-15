@@ -83,3 +83,6 @@ one method performs only one functionality
 write javadoc comments for readability
 make necessary attributes final
 test your code
+
+
+### case vs if statements
