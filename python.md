@@ -68,4 +68,20 @@ Although **Class** is also considered a **build-in type** it shouldn't be treate
 # Modules
 In python a single file behaves almost the same as a module. When there are no global constants in the file it even behaves similar enough that only very rare and weird edge-cases will cause issues.
 
-This module like behaviour is pretty much what more object oriented languages use classes or namespaces for when creating an utility object
+This module like behaviour is pretty much what more object oriented languages use classes or namespaces for when creating an utility object.
+
+
+# Practical
+Python is one of the few langauages that allow single quotes for String. Therefore, never use single quotes when creating dict objects that will be treated as JSON. It must be in double quotes to be loaded correctly.
+
+Closing bracket should be on same indentation as the function start:
+
+```
+def save_face_resources(
+        self,
+        organization_id: str, 
+        file_name: str,
+        file_ext: str,
+        postprocess_output: dict,
+) -> str:
+```

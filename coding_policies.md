@@ -1,4 +1,8 @@
-# IDE format option
+# Before start coding:
+READ THE DOCUMENTATION AND DESCRIPTIONS CAREFULLY! Almost half of your mistakes is you due to forgetting or carelessly skimping
+over important details in the descriptions
+
+## IDE format option
 Before coding, set up your format option in the IDE. This will prevent you from jumping back and forth between different code styles and making code formatting so much easier.
 
 # Strucrture
@@ -90,3 +94,10 @@ Questions to ask:
 Not everything can be unit tested (think databases) and other things will likely only slow down production more than it takes to fix. 
 
 Treat it case by case. Unit testing is great to do, but sometimes it's just too slow.
+
+## Floats and Double
+Avoid direct float or double comparision. 
+
+## Paths
+If the current directory is the tests directory, the relative filepath must be from the tests point of view.
+If the current directory is the parent directory, the relative filepath must be from parent directory point of view.
