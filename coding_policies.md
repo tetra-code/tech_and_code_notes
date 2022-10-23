@@ -1,37 +1,34 @@
-# Coding Policies
-This policy is to help you establish good codin practices. Most of them are derived from the industry standards, which stems from logical decisions
+# IDE format option
+Before coding, set up your format option in the IDE. This will prevent you from jumping back and forth between different code styles and making code formatting so much easier.
 
-## Markdown
-in markdown
-variable, class names are **
-file and directory names are ****
+# Strucrture
 
-## Structure
+## Class
+Typically the question you should as is: "Is there shared data?"
 
-### Order
+Class is a group of functions (in a class called methods). If it is (data-speaking) beneficial to make a class so that they use the same data or similar reasons, put them in a class.
+
+If it isn't, just keep them as separate functions.
+
+Other attributes:
+- one method performs only one functionality
+- write comments and docstrings for readability
+- arguments that should be immutable should be designaed final or constant
+- test your code
+
+## Order
 - Global variables should always be at the top, since it is a custom to always declare them as global variables
 - private methods and utilities should always be mentioned first. The methods that makes use of these should be declared and implemented last
 - Generate class order in a story-like setting. 
 
-### Modules
+## Modules
 - Decouple as much as ossible
 
-### Classes
+## Case vs if-statements
 
-
-
-
-## Names
+# Names
 Naming conventions set by industry standard
 
-### Files
-- short but descriptive (<25 characters) (Briney, 2015)
-- avoid special characters
-- make file and directory names lowercase
-- use hyphens, not underscores, to separate words—for example, query-data.html. Use only standard ASCII alphanumeric characters in file and directory names.
-- if date format is necessary, use the ISO 8601: YYYYMMDD. This makes it easier for platforms to sort files based on date
-
-#### Structure
 Stick to the following naming convention:
 
 (optional)[project] - [platform] - [repository name] - (optional)[description]
@@ -53,12 +50,19 @@ Lambda_DeepfakeProof_API
 Lambda_DeepfakeProof_Analysis
 Browser_DeepfakeProof_Extension
 
-### Code
+## Files
+- short but descriptive (<25 characters) (Briney, 2015)
+- avoid special characters
+- make file and directory names lowercase
+- use hyphens, not underscores, to separate words—for example, query-data.html. Use only standard ASCII alphanumeric characters in file and directory names.
+- if date format is necessary, use the ISO 8601: YYYYMMDD. This makes it easier for platforms to sort files based on date
+
+## Code
 - aim for readability; use meaninful identifiers so that the name by itself should be clear and descriptive. This often requires multiple words
 - Names shouldn't be too long (more than 80 chrs), especially if what they actually do isn't even complex. This is because simple code and functions can be obscured by unnecessarily long names
 
-#### Variables
-- Should soud "nouny". 
+### Variables
+- Should sound "nouny". 
 - Environment variables should always be global variables (thus should always be at the top)
 - Convention:
 
@@ -72,17 +76,17 @@ Bad example: targetsToIgnore, targetsToReuse
 - Add specificity modifiers in front of the core noun, and only when necessary to distinguish a variable from another of a similar type
 - Prefer whole-word nouns to abbreviations
 
-#### Methods/Functions
+### Methods/Functions
 - Should soud "nouny". 
 - Convention:
 
+# Tests
+On the automated unit tests, that one depends on whether or not the said part of the deployment. 
 
-#### Classes
-readable variable and class names
-one method performs only one functionality
-write javadoc comments for readability
-make necessary attributes final
-test your code
+Questions to ask:
+- Can be unit tested?
+- Should be unit tested?
 
+Not everything can be unit tested (think databases) and other things will likely only slow down production more than it takes to fix. 
 
-### case vs if statements
+Treat it case by case. Unit testing is great to do, but sometimes it's just too slow.

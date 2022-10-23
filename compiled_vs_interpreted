@@ -1,0 +1,10 @@
+# Language vs Implementation
+First off, interpreted/compiled is not a property of the language but a property of the implementation.
+
+# Compiled language vs Interpreted language
+A **compiled language** is converted into machine code so that the processor can execute it. An **interpreted language** is a language in which the implementations execute instructions directly without earlier compiling a program into machine language. The compiled programs run faster than interpreted programs.
+
+Normally compiled languages compile directly to the native machine's code. But the compile process in interpreted langauges compiles to a byte code that is used by a vritual machine. This virtual machine (or the interpeter) later converts to the machine code
+
+# Ahead-of-time vs Just-in-time
+A JIT compiler can be faster because the machine code is being generated on the exact machine that it will also execute on.
