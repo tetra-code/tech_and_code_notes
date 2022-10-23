@@ -30,6 +30,9 @@ Other attributes:
 
 ## Case vs if-statements
 
+## String vs Enum
+Cases when specific number of attributes, use Enums instead of Strings for safety
+
 # Names
 Naming conventions set by industry standard
 
