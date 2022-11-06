@@ -43,3 +43,16 @@ ex) max product: this requires a product so any element with 0 needs to be reset
 
 - sometimes combine two practices
 ex) max product of conituig array: combine idea of two pointers AND global,local max comparision
+
+- Sometimes it helps you to traverse more than once; first to get the max or latest values of sth
+from the traversable and then a second traverse to really  calculate what you need
+Ex) partitionLabel. Instead of once traversing and then updating as you go along, it is much
+faster when you already traverse once to get the max index of a character, so that you know
+until how long the partition should be
+
+- Trying to come up with several branches to cover all possible cases can be distracting. Sometimes there is one 
+or two simple conditions checks that covers all t he cases
+ex) unique paths with obstacles
+
+- Memoization: recursively calls but keeping track so that you don't repeat already computed results.
+Ex) fibonnacci 
